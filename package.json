@@ -1,0 +1,15 @@
+{
+  "name": "expenses-tracking-app",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@git.toptal.com:Guy-Brukhis/guy-brukhis.git",
+  "author": "Guy Brukhis <guy.br7@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "engines": {
+    "node": ">=8.1.4",
+    "yarn": "^0.24.6"
+  }
+}
