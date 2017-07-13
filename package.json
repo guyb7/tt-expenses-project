@@ -6,11 +6,19 @@
   "author": "Guy Brukhis <guy.br7@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "start": "babel-node index.js"
+    "client-dev": "cd client && yarn start",
+    "client-build": "cd client && yarn build",
+    "postinstall": "cd client && yarn install",
+    "start": "babel-node index.js",
+    "test": "jest",
+    "test:client": "cd client && jest"
   },
   "engines": {
     "node": ">=8.1.4",
     "yarn": "^0.24.6"
+  },
+  "devDependencies": {
+    "jest": "^20.0.4"
   },
   "dependencies": {
     "babel-cli": "^6.24.1",
