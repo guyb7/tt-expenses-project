@@ -1,21 +1,24 @@
 import express from 'express'
+import Authentication from './Authentication'
+import Users from './components/Users'
 import Login from './components/Login'
 
 const MountAPIRoutes = (app) => {
-  app.get('/api/login', Login.get )
-  app.post('/api/login', Login.post )
+  app.post('/api/register', Users.register )
+  app.get ('/api/login', Authentication.ensureLogin, Login.get )
+  app.post('/api/login', Login.login, Login.success, Login.error )
 }
 
 const MountClientRoutes = (app) => {
-  app.get('/app/?.*', function (req, res) {
+  app.get ('/app/?.*', function (req, res) {
     res.sendFile('/client/build/index.html', { 'root': __dirname + '/../' })
   })
 
-  app.get('/', function (req, res) {
+  app.get ('/', function (req, res) {
     res.sendFile('/public/index.html', { 'root': __dirname + '/../' })
   })
 
-  app.use('/app', express.static('client/build'))
+  app.use ('/app', express.static('client/build'))
   app.use(express.static('public'))
 }
 

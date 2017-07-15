@@ -19,6 +19,13 @@ From the root directory run `yarn install`. It will install the dependencies in 
 APP_NAME=expenses-app
 ENV=development
 PORT=3003
+PG_HOST=localhost
+PG_PORT=5432
+PG_USER=expenses_admin
+PG_PASSWORD=
+PG_DB=expenses_db
+COOKIE_SECRET=
+COOKIE_DAYS_TOEXPIRE=90
 
 **client/config/config.env**
 PORT=3004
