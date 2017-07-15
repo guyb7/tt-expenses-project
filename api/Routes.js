@@ -5,8 +5,9 @@ import Login from './components/Login'
 
 const MountAPIRoutes = (app) => {
   app.post('/api/register', Users.register )
-  app.get ('/api/login', Authentication.ensureLogin, Login.get )
+  // app.get ('/api/login', Authentication.ensureLogin, Login.get )
   app.post('/api/login', Login.login, Login.success, Login.error )
+  app.get ('/api/profile', Authentication.ensureLogin, Users.getCurrent )
 }
 
 const MountClientRoutes = (app) => {

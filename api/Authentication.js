@@ -6,7 +6,7 @@ import Users from './components/Users'
 
 const findUser = (username, password) => {
   return new Promise((resolve, reject) => {
-    Users.findUser(username)
+    Users.findUser({ username })
     .then(user => resolve({ user: user.user, password }))
     .catch(e => reject(e))
   })
@@ -41,7 +41,7 @@ const SetupPassport = (app) => {
   ))
 
   passport.serializeUser((user, done) => {
-    done(null, { id: user.id, name: user.name, role: user.role })
+    done(null, { id: user.id, username: user.username, name: user.name, role: user.role })
   })
 
   passport.deserializeUser((id, done) => {
@@ -52,7 +52,7 @@ const SetupPassport = (app) => {
         name: 'Guy'
       }
     }
-    done(null, users[id])
+    done(null, users[123])
   })
 
   app.use(passport.initialize())
@@ -60,6 +60,7 @@ const SetupPassport = (app) => {
 
 const ensureLogin = (req, res, next) => {
   if (req.session && req.session.isLoggedIn === true) {
+    req.user = req.session.passport.user
     return next()
   }
   req.session.isLoggedIn = false

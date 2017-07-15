@@ -78,9 +78,15 @@ const register = (req, res) => {
   })
 }
 
-const findUser = (username) => {
+const findUser = ({ id, username }) => {
   return new Promise((resolve, reject) => {
-    Db.pool.query('SELECT * FROM users WHERE username=$1 LIMIT 1', [username])
+    let queryPromise
+    if (id) {
+      queryPromise = Db.pool.query('SELECT * FROM users WHERE id=$1 LIMIT 1', [id])
+    } else if (username) {
+      queryPromise = Db.pool.query('SELECT * FROM users WHERE username=$1 LIMIT 1', [username])
+    }
+    queryPromise
     .then(users => {
       if (users.rows.length !== 1) {
         reject(new Error('No such user'))
@@ -91,7 +97,28 @@ const findUser = (username) => {
   })
 }
 
+const getCurrent = (req, res) => {
+  findUser({ id: req.user.id })
+  .then(({ user }) => {
+    res.json({
+      success: true,
+      user: _.pick(user, ['id', 'username', 'name', 'role'])
+    })
+  })
+  .catch(e => {
+    console.log('Error getCurrent', e)
+    res.status(400).json({
+      success: false,
+      error: {
+        id: 'user-not-found',
+        text: 'Could not find your user'
+      }
+    })
+  })
+}
+
 export default {
   register,
-  findUser
+  findUser,
+  getCurrent
 }
