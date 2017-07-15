@@ -117,8 +117,32 @@ const getCurrent = (req, res) => {
   })
 }
 
+const update = (req, res) => {
+  Db.pool.query('UPDATE users SET name=$2 WHERE id=$1', [req.user.id, req.body.name])
+  .then(result => {
+    if (result.rowCount !== 1) {
+      throw new Error('Could not create user')
+    } else {
+      res.json({
+        success: true
+      })
+    }
+  })
+  .catch(e => {
+    console.log('Error update Users', e)
+    res.status(401).json({
+      success: false,
+      error: {
+        id: 'update-profile-error',
+        text: 'Could not update your profile'
+      }
+    })
+  })
+}
+
 export default {
   register,
   findUser,
-  getCurrent
+  getCurrent,
+  update
 }
