@@ -7,6 +7,7 @@ export default {
     .then(sessions => {
       res.json({
         sessions: sessions.rows,
+        session: req.session,
         user: req.user
       })
     })
@@ -33,6 +34,16 @@ export default {
         id: 'invalid-credentials',
         text: 'Wrong username or password'
       }
+    })
+  },
+
+  logout: (req, res) => {
+    req.session.isLoggedIn = false
+    req.session.save()
+    req.session.destroy()
+    req.logout()
+    res.json({
+      success: true
     })
   }
 }
