@@ -1,7 +1,8 @@
 import express from 'express'
 import Authentication from './Authentication'
-import Users from './components/Users'
 import Login from './components/Login'
+import Users from './components/Users'
+import Expenses from './components/Expenses'
 
 const MountAPIRoutes = (app) => {
   app.post('/api/register', Users.register )
@@ -10,6 +11,7 @@ const MountAPIRoutes = (app) => {
   app.get ('/api/logout', Login.logout )
   app.get ('/api/profile', Authentication.ensureLogin, Users.getCurrent )
   app.put ('/api/profile', Authentication.ensureLogin, Users.update )
+  app.post('/api/expenses', Authentication.ensureLogin, Expenses.createExpense )
 }
 
 const MountClientRoutes = (app) => {

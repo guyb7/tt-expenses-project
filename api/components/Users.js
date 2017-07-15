@@ -46,7 +46,7 @@ const createNewUser = ({ req, hash }) => {
     ]
     Db.pool.query('INSERT INTO users (id, username, password, name, role) VALUES ($1, $2, $3, $4, $5);', params, (err, result) => {
       if (err || result.rowCount !== 1) {
-        console.error('Create guest user failed', userId, err, result)
+        console.error('Create user failed', userId, err, result)
         reject (new Error('Could not create user'))
       } else {
         resolve({ req, userId })
