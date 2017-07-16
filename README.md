@@ -114,11 +114,10 @@ GET __/users/:userId__
 PUT __/users/:userId__
 DELETE __/users/:userId__
 GET __/user/:userId/expenses?year=:year&week=:week__
-GET __/user/:userId/expenses/search?q=something__
 POST __/user/:userId/expenses__
-GET __/user/:userId/expenses/:expenseId__
-PUT __/user/:userId/expenses/:expenseId__
-DELETE __/user/:userId/expenses/:expenseId__
+GET __/expenses/:expenseId__
+PUT __/expenses/:expenseId__
+DELETE __/expenses/:expenseId__
 
 ### Authentication
 Call `/login` with credentials. A successful request will set a cookie `session` with a token.

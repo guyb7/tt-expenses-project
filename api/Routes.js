@@ -5,21 +5,36 @@ import Login from './components/Login'
 import Users from './components/Users'
 import Expenses from './components/Expenses'
 
+const MountGuestRoutes = (app) => {
+  app.post   ('/api/register', Users.register )
+  app.post   ('/api/login', Login.login, Login.success, Login.error )
+}
+
 const MountAPIRoutes = (app) => {
-  app.post('/api/register', Users.register )
-  app.post('/api/login', Login.login, Login.success, Login.error )
-  app.get ('/api/logout', Login.logout )
-  app.get ('/api/profile', Authentication.ensureLogin, Users.getCurrent )
-  app.put ('/api/profile', Authentication.ensureLogin, Users.update )
-  app.get ('/api/expenses', Authentication.ensureLogin, Expenses.listExpenses )
-  app.post('/api/expenses', Authentication.ensureLogin, Expenses.createExpense )
-  app.get ('/api/expenses/:expenseId', Authentication.ensureLogin, Expenses.getExpense )
-  app.put ('/api/expenses/:expenseId', Authentication.ensureLogin, Expenses.updateExpense )
-  app.delete ('/api/expenses/:expenseId', Authentication.ensureLogin, Expenses.deleteExpense )
+  const ensureLogin = Authentication.ensureLogin
+  app.get    ('/api/logout', Login.logout )
+  app.get    ('/api/profile', ensureLogin, Users.getCurrent )
+  app.put    ('/api/profile', ensureLogin, Users.update )
+  app.get    ('/api/expenses', ensureLogin, Expenses.listExpenses )
+  app.post   ('/api/expenses', ensureLogin, Expenses.createExpense )
+  app.get    ('/api/expenses/:expenseId', ensureLogin, Expenses.getExpense )
+  app.put    ('/api/expenses/:expenseId', ensureLogin, Expenses.updateExpense )
+  app.delete ('/api/expenses/:expenseId', ensureLogin, Expenses.deleteExpense )
 }
 
 const MountAdminRoutes = (app) => {
-  app.get ('/api/admin', Authentication.ensureLogin, Authentication.ensureAdmin, Admin.test )
+  const ensureAdmin = Authentication.ensureAdmin
+  app.get    ('/api/admin', ensureAdmin, Admin.test )
+  // app.get   ('/api/admin/users', ensureAdmin, Admin.listUsers )
+  // app.post  ('/api/admin/users', ensureAdmin, Admin.createUser )
+  // app.get   ('/api/admin/users/:userId', ensureAdmin, Admin.getUser )
+  // app.put   ('/api/admin/users/:userId', ensureAdmin, Admin.updateUser )
+  // app.delete('/api/admin/users/:userId', ensureAdmin, Admin.deleteUser )
+  // app.get   ('/api/admin/users/:userId/expenses', ensureAdmin, Admin.getUserExpenses )
+  // app.post  ('/api/admin/users/:userId/expenses', ensureAdmin, Admin.createExpenseForUser )
+  // app.get   ('/api/admin/expenses/:expenseId', ensureAdmin, Admin.getExpense )
+  // app.put   ('/api/admin/expenses/:expenseId', ensureAdmin, Admin.updateExpense )
+  // app.delete('/api/admin/expenses/:expenseId', ensureAdmin, Admin.deleteExpense )
 }
 
 const MountClientRoutes = (app) => {
@@ -37,6 +52,7 @@ const MountClientRoutes = (app) => {
 
 export default {
   mount: (app) => {
+    MountGuestRoutes(app)
     MountAPIRoutes(app)
     MountAdminRoutes(app)
     MountClientRoutes(app)

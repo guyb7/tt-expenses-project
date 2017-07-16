@@ -71,10 +71,12 @@ const ensureLogin = (req, res, next) => {
 }
 
 const ensureAdmin = (req, res, next) => {
-  if (_.has(req, 'session.passport.user.role') && req.session.isLoggedIn === true && _.indexOf(['admin', 'manager'], req.session.passport.user.role) > -1) {
-    return next()
-  }
-  Errors.handleError(req, res, undefined, 'unauthorized')
+  ensureLogin(req, res, () => {
+    if (_.has(req, 'session.passport.user.role') && req.session.isLoggedIn === true && _.indexOf(['admin', 'manager'], req.session.passport.user.role) > -1) {
+      return next()
+    }
+    Errors.handleError(req, res, undefined, 'unauthorized')
+  })
 }
 
 export default {
