@@ -88,9 +88,38 @@ const listExpenses = (req, res) => {
   })
 }
 
+const getExpense = (req, res) => {
+  const params = [
+    req.user.id,
+    req.params.expenseId
+  ]
+  Db.pool.query('SELECT id, datetime, amount, description, comment FROM expenses WHERE user_id = $1 AND id = $2;', params)
+  .then((result) => {
+    if (result.rows.length !== 1) {
+      throw new Error('This expense does not exist')
+    }
+    res.json({
+      success: true,
+      expense: result.rows[0]
+    })
+  })
+  .catch(e => {
+    //TODO check for different errors
+    console.log('Get expense failed', e)
+    res.status(401).json({
+      success: false,
+      error: {
+        id: 'error-get-expense',
+        text: 'This expense could not be found'
+      }
+    })
+  })
+}
+
 export default {
   createExpense,
   listExpenses,
+  getExpense,
   // updateExpense,
   // deleteExpense
 }

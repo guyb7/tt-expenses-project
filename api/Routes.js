@@ -13,6 +13,7 @@ const MountAPIRoutes = (app) => {
   app.put ('/api/profile', Authentication.ensureLogin, Users.update )
   app.get ('/api/expenses', Authentication.ensureLogin, Expenses.listExpenses )
   app.post('/api/expenses', Authentication.ensureLogin, Expenses.createExpense )
+  app.get ('/api/expenses/:expenseId', Authentication.ensureLogin, Expenses.getExpense )
 }
 
 const MountClientRoutes = (app) => {
