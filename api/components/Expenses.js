@@ -1,5 +1,6 @@
 import Db from '../Database'
 import Promise from 'bluebird'
+import moment from 'moment'
 import uuid from 'uuid/v4'
 import _ from 'lodash'
 
@@ -38,9 +39,58 @@ const createExpense = (req, res) => {
   })
 }
 
+const getDateRange = (query) => {
+  const from = {
+    year: moment().year(),
+    week: moment().week(),
+    day: 'monday'
+  }
+  if (query.week) {
+    from.week = Number(query.week)
+    if (query.year) {
+      from.year = Number(query.year)
+    }
+  }
+  if (query.day && _.indexOf(['sunday', 'monday'], query.day) > -1) {
+    from.day = query.day
+  }
+  const start = moment().utc().year(from.year).week(from.week).day(from.day).hour(0).minute(0).second(0)
+  return {
+    from: start.format(),
+    until: moment(start).add(1, 'weeks').format()
+  }
+}
+
+const listExpenses = (req, res) => {
+  const range = getDateRange(req.query)
+  const params = [
+    req.user.id,
+    range.from,
+    range.until
+  ]
+  Db.pool.query('SELECT id, datetime, amount, description, comment FROM expenses WHERE user_id = $1 AND datetime >= $2 AND datetime < $3;', params)
+  .then((result) => {
+    res.json({
+      success: true,
+      expenses: result.rows
+    })
+  })
+  .catch(e => {
+    //TODO check for different errors
+    console.log('List expenses failed', e)
+    res.status(401).json({
+      success: false,
+      error: {
+        id: 'error-list-expenses',
+        text: 'There was a problem listing your expenses'
+      }
+    })
+  })
+}
+
 export default {
   createExpense,
-  // findExpenses,
+  listExpenses,
   // updateExpense,
   // deleteExpense
 }
