@@ -9,7 +9,7 @@ const createExpense = (req, res) => {
   const params = [
     expenseId,
     req.user.id,
-    req.body.datetime,
+    moment(req.body.datetime).format(),
     req.body.amount,
     req.body.description || '',
     req.body.comment || ''
@@ -61,6 +61,13 @@ const getDateRange = (query) => {
   }
 }
 
+const normalizeRow = row => {
+  if (row.datetime) {
+    row.datetime = moment(row.datetime).format()
+  }
+  return row
+}
+
 const listExpenses = (req, res) => {
   const range = getDateRange(req.query)
   const params = [
@@ -72,7 +79,7 @@ const listExpenses = (req, res) => {
   .then((result) => {
     res.json({
       success: true,
-      expenses: result.rows
+      expenses: _.map(result.rows, normalizeRow)
     })
   })
   .catch(e => {
@@ -100,7 +107,7 @@ const getExpense = (req, res) => {
     }
     res.json({
       success: true,
-      expense: result.rows[0]
+      expense: normalizeRow(result.rows[0])
     })
   })
   .catch(e => {
@@ -116,10 +123,63 @@ const getExpense = (req, res) => {
   })
 }
 
+const updateExpense = (req, res) => {
+  const sqlFields = {
+    // datetime: '2017-01-01 20:00:00',
+    // amount: 3.30,
+    // description: 'Party hats',
+    // comment: 'New year'
+  }
+  _.each(['datetime', 'amount', 'description', 'comment'], f => {
+    if (_.has(req.body, f)) {
+      if (f === 'datetime') {
+        sqlFields[f] = moment(req.body[f]).format()
+      } else {
+        sqlFields[f] = req.body[f]
+      }
+    }
+  })
+  if (_.keys(sqlFields).length === 0) {
+    // Nothing to update
+    return res.json({
+      success: true
+    })
+  }
+  const sql = []
+  const params = []
+  let n = 3
+  _.each(sqlFields, (v, k) => {
+    sql.push(k + '=$' + n)
+    params.push(v)
+    n++
+  })
+  Db.pool.query('UPDATE expenses SET ' + sql.join(', ') + ' WHERE user_id=$1 AND id=$2;', [req.user.id, req.params.expenseId, ...params])
+  .then((result) => {
+    if (result.rowCount !== 1) {
+      throw new Error('Could not update this expense')
+    } else {
+      res.json({
+        success: true
+      })
+    }
+  })
+  .catch(e => {
+    //TODO check for different errors
+    console.log('Update expense failed', e)
+    res.status(401).json({
+      success: false,
+      error: {
+        id: 'error-update-expense',
+        text: 'This expense could not be updated'
+      }
+    })
+  })
+}
+
 export default {
   createExpense,
   listExpenses,
   getExpense,
-  // updateExpense,
+  updateExpense,
   // deleteExpense
 }
