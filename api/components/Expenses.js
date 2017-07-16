@@ -176,10 +176,34 @@ const updateExpense = (req, res) => {
   })
 }
 
+const deleteExpense = (req, res) => {
+  Db.pool.query('DELETE FROM expenses WHERE user_id=$1 AND id=$2;', [req.user.id, req.params.expenseId])
+  .then((result) => {
+    if (result.rowCount !== 1) {
+      throw new Error('Could not delete this expense')
+    } else {
+      res.json({
+        success: true
+      })
+    }
+  })
+  .catch(e => {
+    //TODO check for different errors
+    console.log('Delete expense failed', e)
+    res.status(401).json({
+      success: false,
+      error: {
+        id: 'error-delete-expense',
+        text: 'This expense could not be deleted'
+      }
+    })
+  })
+}
+
 export default {
   createExpense,
   listExpenses,
   getExpense,
   updateExpense,
-  // deleteExpense
+  deleteExpense
 }
