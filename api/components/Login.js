@@ -3,17 +3,6 @@ import Db from '../Database'
 import Errors from '../Errors'
 
 export default {
-  get: async (req, res) => {
-    Db.pool.query('SELECT sid FROM user_sessions', [])
-    .then(sessions => {
-      res.json({
-        sessions: sessions.rows,
-        session: req.session,
-        user: req.user
-      })
-    })
-  },
-
   login: (req, res, next) => {
     Authentication.authenticate(req, res, next)
   },

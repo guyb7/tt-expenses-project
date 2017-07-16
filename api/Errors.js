@@ -1,6 +1,8 @@
 const errors = {
   'something-went-wrong': 'Aww, something went wrong!',
   'invalid-credentials': 'Wrong username or password',
+  'session-expired': 'Your session has expired',
+  'unauthorized': 'You are not authorized to make this request',
   'error-creating-expense': 'Could not create this expense',
   'error-list-expenses': 'There was a problem listing your expenses',
   'no-such-expense': 'This expense does not exist',

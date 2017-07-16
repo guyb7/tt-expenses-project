@@ -2,7 +2,9 @@ import passport from 'passport'
 import LocalStrategy from 'passport-local'
 import Promise from 'bluebird'
 import bcrypt from 'bcrypt'
+import _ from 'lodash'
 import Users from './components/Users'
+import Errors from './Errors'
 
 const findUser = (username, password) => {
   return new Promise((resolve, reject) => {
@@ -65,13 +67,14 @@ const ensureLogin = (req, res, next) => {
   }
   req.session.isLoggedIn = false
   req.session.save()
-  res.status(401).json({
-    success: false,
-    error: {
-      id: 'session-expired',
-      text: 'Your session has expired'
-    }
-  })
+  Errors.handleError(req, res, undefined, 'session-expired')
+}
+
+const ensureAdmin = (req, res, next) => {
+  if (_.has(req, 'session.passport.user.role') && req.session.isLoggedIn === true && _.indexOf(['admin', 'manager'], req.session.passport.user.role) > -1) {
+    return next()
+  }
+  Errors.handleError(req, res, undefined, 'unauthorized')
 }
 
 export default {
@@ -81,5 +84,7 @@ export default {
 
   authenticate: passport.authenticate('local', { failWithError: true }),
 
-  ensureLogin: ensureLogin
+  ensureLogin: ensureLogin,
+  
+  ensureAdmin: ensureAdmin
 }

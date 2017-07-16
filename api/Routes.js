@@ -1,12 +1,12 @@
 import express from 'express'
 import Authentication from './Authentication'
+import Admin from './components/Admin'
 import Login from './components/Login'
 import Users from './components/Users'
 import Expenses from './components/Expenses'
 
 const MountAPIRoutes = (app) => {
   app.post('/api/register', Users.register )
-  // app.get ('/api/login', Authentication.ensureLogin, Login.get )
   app.post('/api/login', Login.login, Login.success, Login.error )
   app.get ('/api/logout', Login.logout )
   app.get ('/api/profile', Authentication.ensureLogin, Users.getCurrent )
@@ -16,6 +16,10 @@ const MountAPIRoutes = (app) => {
   app.get ('/api/expenses/:expenseId', Authentication.ensureLogin, Expenses.getExpense )
   app.put ('/api/expenses/:expenseId', Authentication.ensureLogin, Expenses.updateExpense )
   app.delete ('/api/expenses/:expenseId', Authentication.ensureLogin, Expenses.deleteExpense )
+}
+
+const MountAdminRoutes = (app) => {
+  app.get ('/api/admin', Authentication.ensureLogin, Authentication.ensureAdmin, Admin.test )
 }
 
 const MountClientRoutes = (app) => {
@@ -34,6 +38,7 @@ const MountClientRoutes = (app) => {
 export default {
   mount: (app) => {
     MountAPIRoutes(app)
+    MountAdminRoutes(app)
     MountClientRoutes(app)
   }
 }

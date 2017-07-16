@@ -100,7 +100,7 @@ POST __/login__
 GET __/logout__
 GET __/profile__
 PUT __/profile__
-GET __/expenses?year=:year&week=:week__
+GET __/expenses?year=:year&week=:week&day=monday__
 POST __/expenses__
 GET __/expenses/:expenseId__
 PUT __/expenses/:expenseId__
