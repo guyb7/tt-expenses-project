@@ -4,6 +4,26 @@ import moment from 'moment'
 import uuid from 'uuid/v4'
 import _ from 'lodash'
 
+const errors = {
+  'something-went-wrong': 'Aww, something went wrong!',
+  'error-creating-expense': 'Could not create this expense',
+  'error-list-expenses': 'There was a problem listing your expenses',
+  'no-such-expense': 'This expense does not exist',
+  'error-get-expense': 'This expense could not be found',
+  'error-update-expense': 'This expense does not exist or could not be updated',
+  'error-delete-expense': 'This expense does not exist or could not be deleted'
+}
+const handleError = (res, err, defaultMessage = 'something-went-wrong') => {
+  console.log('[ERR]', defaultMessage, err)
+  res.status(401).json({
+    success: false,
+    error: {
+      id: err.message || defaultMessage,
+      text: errors[err.message] || err.message || errors[defaultMessage] || defaultMessage
+    }
+  })
+}
+
 const createExpense = (req, res) => {
   const expenseId = uuid()
   const params = [
@@ -18,7 +38,7 @@ const createExpense = (req, res) => {
   .then((result) => {
     if (result.rowCount !== 1) {
       console.error('Create expense failed', userId, req.body, err, result)
-      reject (new Error('Could not create expense'))
+      reject(new Error())
     } else {
       res.json({
         success: true,
@@ -27,15 +47,7 @@ const createExpense = (req, res) => {
     }
   })
   .catch(e => {
-    //TODO check for different errors
-    console.log('Create expense failed', e)
-    res.status(401).json({
-      success: false,
-      error: {
-        id: 'error-creating-expense',
-        text: 'Could not create this expense'
-      }
-    })
+    handleError(res, e, 'error-creating-expense')
   })
 }
 
@@ -83,15 +95,7 @@ const listExpenses = (req, res) => {
     })
   })
   .catch(e => {
-    //TODO check for different errors
-    console.log('List expenses failed', e)
-    res.status(401).json({
-      success: false,
-      error: {
-        id: 'error-list-expenses',
-        text: 'There was a problem listing your expenses'
-      }
-    })
+    handleError(res, e, 'error-list-expenses')
   })
 }
 
@@ -103,7 +107,7 @@ const getExpense = (req, res) => {
   Db.pool.query('SELECT id, datetime, amount, description, comment FROM expenses WHERE user_id = $1 AND id = $2;', params)
   .then((result) => {
     if (result.rows.length !== 1) {
-      throw new Error('This expense does not exist')
+      throw new Error('no-such-expense')
     }
     res.json({
       success: true,
@@ -111,15 +115,7 @@ const getExpense = (req, res) => {
     })
   })
   .catch(e => {
-    //TODO check for different errors
-    console.log('Get expense failed', e)
-    res.status(401).json({
-      success: false,
-      error: {
-        id: 'error-get-expense',
-        text: 'This expense could not be found'
-      }
-    })
+    handleError(res, e, 'error-get-expense')
   })
 }
 
@@ -156,7 +152,7 @@ const updateExpense = (req, res) => {
   Db.pool.query('UPDATE expenses SET ' + sql.join(', ') + ' WHERE user_id=$1 AND id=$2;', [req.user.id, req.params.expenseId, ...params])
   .then((result) => {
     if (result.rowCount !== 1) {
-      throw new Error('Could not update this expense')
+      throw new Error()
     } else {
       res.json({
         success: true
@@ -164,15 +160,7 @@ const updateExpense = (req, res) => {
     }
   })
   .catch(e => {
-    //TODO check for different errors
-    console.log('Update expense failed', e)
-    res.status(401).json({
-      success: false,
-      error: {
-        id: 'error-update-expense',
-        text: 'This expense could not be updated'
-      }
-    })
+    handleError(res, e, 'error-update-expense')
   })
 }
 
@@ -180,7 +168,7 @@ const deleteExpense = (req, res) => {
   Db.pool.query('DELETE FROM expenses WHERE user_id=$1 AND id=$2;', [req.user.id, req.params.expenseId])
   .then((result) => {
     if (result.rowCount !== 1) {
-      throw new Error('Could not delete this expense')
+      throw new Error()
     } else {
       res.json({
         success: true
@@ -188,15 +176,7 @@ const deleteExpense = (req, res) => {
     }
   })
   .catch(e => {
-    //TODO check for different errors
-    console.log('Delete expense failed', e)
-    res.status(401).json({
-      success: false,
-      error: {
-        id: 'error-delete-expense',
-        text: 'This expense could not be deleted'
-      }
-    })
+    handleError(res, e, 'error-delete-expense')
   })
 }
 
