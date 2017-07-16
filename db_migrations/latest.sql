@@ -5,8 +5,6 @@
 -- Dumped from database version 9.6.3
 -- Dumped by pg_dump version 9.6.3
 
--- Started on 2017-07-13 12:45:18 IDT
-
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
@@ -17,7 +15,6 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- TOC entry 8 (class 2615 OID 16396)
 -- Name: expenses; Type: SCHEMA; Schema: -; Owner: expenses_admin
 --
 
@@ -33,7 +30,22 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- TOC entry 186 (class 1259 OID 16397)
+-- Name: expenses; Type: TABLE; Schema: expenses; Owner: expenses_admin
+--
+
+CREATE TABLE expenses (
+    id character varying NOT NULL,
+    user_id character varying NOT NULL,
+    datetime timestamp without time zone NOT NULL,
+    amount numeric NOT NULL,
+    description character varying,
+    comment character varying
+);
+
+
+ALTER TABLE expenses OWNER TO expenses_admin;
+
+--
 -- Name: user_sessions; Type: TABLE; Schema: expenses; Owner: expenses_admin
 --
 
@@ -47,7 +59,29 @@ CREATE TABLE user_sessions (
 ALTER TABLE user_sessions OWNER TO expenses_admin;
 
 --
--- TOC entry 2268 (class 2606 OID 16404)
+-- Name: users; Type: TABLE; Schema: expenses; Owner: expenses_admin
+--
+
+CREATE TABLE users (
+    id character varying NOT NULL,
+    username character varying NOT NULL,
+    password character varying NOT NULL,
+    name character varying NOT NULL,
+    role character varying NOT NULL
+);
+
+
+ALTER TABLE users OWNER TO expenses_admin;
+
+--
+-- Name: expenses id; Type: CONSTRAINT; Schema: expenses; Owner: expenses_admin
+--
+
+ALTER TABLE ONLY expenses
+    ADD CONSTRAINT id PRIMARY KEY (id);
+
+
+--
 -- Name: user_sessions session_pkey; Type: CONSTRAINT; Schema: expenses; Owner: expenses_admin
 --
 
@@ -55,7 +89,36 @@ ALTER TABLE ONLY user_sessions
     ADD CONSTRAINT session_pkey PRIMARY KEY (sid);
 
 
--- Completed on 2017-07-13 12:45:18 IDT
+--
+-- Name: users username; Type: CONSTRAINT; Schema: expenses; Owner: expenses_admin
+--
+
+ALTER TABLE ONLY users
+    ADD CONSTRAINT username UNIQUE (username);
+
+
+--
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: expenses; Owner: expenses_admin
+--
+
+ALTER TABLE ONLY users
+    ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: idx_user_time; Type: INDEX; Schema: expenses; Owner: expenses_admin
+--
+
+CREATE INDEX idx_user_time ON expenses USING btree (user_id, datetime NULLS FIRST);
+
+
+--
+-- Name: expenses user_id; Type: FK CONSTRAINT; Schema: expenses; Owner: expenses_admin
+--
+
+ALTER TABLE ONLY expenses
+    ADD CONSTRAINT user_id FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
 
 --
 -- PostgreSQL database dump complete
