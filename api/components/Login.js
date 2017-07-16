@@ -1,5 +1,6 @@
 import Authentication from '../Authentication'
 import Db from '../Database'
+import Errors from '../Errors'
 
 export default {
   get: async (req, res) => {
@@ -28,13 +29,7 @@ export default {
   error: (err, req, res, next) => {
     req.session.isLoggedIn = false
     req.session.save()
-    res.status(401).json({
-      success: false,
-      error: {
-        id: 'invalid-credentials',
-        text: 'Wrong username or password'
-      }
-    })
+    Errors.handleError(req, res, undefined, 'invalid-credentials')
   },
 
   logout: (req, res) => {

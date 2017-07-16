@@ -1,28 +1,9 @@
 import Db from '../Database'
+import Errors from '../Errors'
 import Promise from 'bluebird'
 import moment from 'moment'
 import uuid from 'uuid/v4'
 import _ from 'lodash'
-
-const errors = {
-  'something-went-wrong': 'Aww, something went wrong!',
-  'error-creating-expense': 'Could not create this expense',
-  'error-list-expenses': 'There was a problem listing your expenses',
-  'no-such-expense': 'This expense does not exist',
-  'error-get-expense': 'This expense could not be found',
-  'error-update-expense': 'This expense does not exist or could not be updated',
-  'error-delete-expense': 'This expense does not exist or could not be deleted'
-}
-const handleError = (res, err, defaultMessage = 'something-went-wrong') => {
-  console.log('[ERR]', defaultMessage, err)
-  res.status(401).json({
-    success: false,
-    error: {
-      id: err.message || defaultMessage,
-      text: errors[err.message] || err.message || errors[defaultMessage] || defaultMessage
-    }
-  })
-}
 
 const createExpense = (req, res) => {
   const expenseId = uuid()
@@ -37,7 +18,6 @@ const createExpense = (req, res) => {
   Db.pool.query('INSERT INTO expenses (id, user_id, datetime, amount, description, comment) VALUES ($1, $2, $3, $4, $5, $6);', params)
   .then((result) => {
     if (result.rowCount !== 1) {
-      console.error('Create expense failed', userId, req.body, err, result)
       reject(new Error())
     } else {
       res.json({
@@ -47,7 +27,7 @@ const createExpense = (req, res) => {
     }
   })
   .catch(e => {
-    handleError(res, e, 'error-creating-expense')
+    Errors.handleError(req, res, e, 'error-creating-expense')
   })
 }
 
@@ -95,7 +75,7 @@ const listExpenses = (req, res) => {
     })
   })
   .catch(e => {
-    handleError(res, e, 'error-list-expenses')
+    Errors.handleError(req, res, e, 'error-list-expenses')
   })
 }
 
@@ -115,7 +95,7 @@ const getExpense = (req, res) => {
     })
   })
   .catch(e => {
-    handleError(res, e, 'error-get-expense')
+    Errors.handleError(req, res, e, 'error-get-expense')
   })
 }
 
@@ -160,7 +140,7 @@ const updateExpense = (req, res) => {
     }
   })
   .catch(e => {
-    handleError(res, e, 'error-update-expense')
+    Errors.handleError(req, res, e, 'error-update-expense')
   })
 }
 
@@ -176,7 +156,7 @@ const deleteExpense = (req, res) => {
     }
   })
   .catch(e => {
-    handleError(res, e, 'error-delete-expense')
+    Errors.handleError(req, res, e, 'error-delete-expense')
   })
 }
 

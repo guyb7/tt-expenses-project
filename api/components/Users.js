@@ -1,4 +1,5 @@
 import Db from '../Database'
+import Errors from '../Errors'
 import bcrypt from 'bcrypt'
 import Promise from 'bluebird'
 import uuid from 'uuid/v4'
@@ -46,8 +47,7 @@ const createNewUser = ({ req, hash }) => {
     ]
     Db.pool.query('INSERT INTO users (id, username, password, name, role) VALUES ($1, $2, $3, $4, $5);', params, (err, result) => {
       if (err || result.rowCount !== 1) {
-        console.error('Create user failed', userId, err, result)
-        reject (new Error('Could not create user'))
+        reject (new Error('error-creating-user'))
       } else {
         resolve({ req, userId })
       }
@@ -66,15 +66,7 @@ const register = (req, res) => {
     })
   })
   .catch(e => {
-    //TODO check for different errors
-    console.log('Registration error', e)
-    res.status(401).json({
-      success: false,
-      error: {
-        id: 'wrong-registration-details',
-        text: 'Could not create this account'
-      }
-    })
+    Errors.handleError(req, res, e, 'wrong-registration-details')
   })
 }
 
@@ -89,7 +81,7 @@ const findUser = ({ id, username }) => {
     queryPromise
     .then(users => {
       if (users.rows.length !== 1) {
-        reject(new Error('No such user'))
+        reject(new Error('no-such-user'))
       } else {
         resolve({ user: users.rows[0] })
       }
@@ -106,14 +98,7 @@ const getCurrent = (req, res) => {
     })
   })
   .catch(e => {
-    console.log('Error getCurrent', e)
-    res.status(400).json({
-      success: false,
-      error: {
-        id: 'user-not-found',
-        text: 'Could not find your user'
-      }
-    })
+    Errors.handleError(req, res, e, 'user-not-found')
   })
 }
 
@@ -121,7 +106,7 @@ const update = (req, res) => {
   Db.pool.query('UPDATE users SET name=$2 WHERE id=$1', [req.user.id, req.body.name])
   .then(result => {
     if (result.rowCount !== 1) {
-      throw new Error('Could not create user')
+      throw new Error()
     } else {
       res.json({
         success: true
@@ -129,14 +114,7 @@ const update = (req, res) => {
     }
   })
   .catch(e => {
-    console.log('Error update Users', e)
-    res.status(401).json({
-      success: false,
-      error: {
-        id: 'update-profile-error',
-        text: 'Could not update your profile'
-      }
-    })
+    Errors.handleError(req, res, e, 'error-updating-user')
   })
 }
 
