@@ -4,7 +4,7 @@ process.env.PORT = 3003 // if changed, modify testURL in package.json
 process.env.PG_DB = 'expenses_test_db'
 
 import axios from 'axios'
-// import Db from './Database'
+import Db from './Database'
 import Server from './Server'
 
 const instance = axios.create({
@@ -18,6 +18,7 @@ beforeAll(() => {
 
 afterAll(() => {
   Server.shutDown()
+  Db.disconnect()
 })
 
 test('Server is running', done => {
