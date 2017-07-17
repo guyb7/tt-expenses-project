@@ -1,7 +1,5 @@
 import '../env'
-process.env.ENV = 'test'
-process.env.PORT = 3003 // if changed, modify testURL in package.json
-process.env.PG_DB = 'expenses_test_db'
+// process.env.PORT is 3003 - if changed, also modify testURL in package.json
 
 import axios from 'axios'
 import Db from './Database'
@@ -9,34 +7,44 @@ import Server from './Server'
 
 const instance = axios.create({
   baseURL: 'http://127.0.0.1:3003/api/',
-  timeout: 1000
+  withCredentials: true,
+  timeout: 200
 })
 
 beforeAll(() => {
   Server.start()
+  //TODO create schema and tables
 })
 
 afterAll(() => {
   Server.shutDown()
+  //TODO drop schema
   Db.disconnect()
 })
 
 describe('API Sanity Tests', () => {
   test('Server is running', done => {
     instance.get('/status')
-    .then(function (response) {
+    .then((response) => {
       expect(response.data.success).toBe(true)
       done()
     })
-    .catch(function (error) {
+    .catch(error => {
       console.log(error)
     })
   })
 })
 
 describe('Regular User Flow', () => {
-  xtest('New user is able to register', done => {
-    done()
+  test('New user is able to register', done => {
+    instance.post('/register', { username: 'user1', password: '12341234' })
+    .then((response) => {
+      expect(response.status).toBe(200)
+      done()
+    })
+    .catch(error => {
+      console.log(error)
+    })
   })
 
   xtest('User is able to login', done => {
