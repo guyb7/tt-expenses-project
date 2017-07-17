@@ -61,21 +61,33 @@ const normalizeRow = row => {
 }
 
 const listExpenses = (req, res) => {
-  const range = getDateRange(req.query)
-  const params = [
-    req.user.id,
-    range.from,
-    range.until
-  ]
-  Db.pool.query('SELECT id, datetime, amount, description, comment FROM expenses WHERE user_id = $1 AND datetime >= $2 AND datetime < $3;', params)
-  .then((result) => {
+  findExpenses(req.user.id, req.query)
+  .then(({ expenses }) => {
     res.json({
       success: true,
-      expenses: _.map(result.rows, normalizeRow)
+      expenses
     })
   })
   .catch(e => {
     Errors.handleError(req, res, e, 'error-list-expenses')
+  })
+}
+
+const findExpenses = (userId, query) => {
+  return new Promise((resolve, reject) => {
+    const range = getDateRange(query)
+    const params = [
+      userId,
+      range.from,
+      range.until
+    ]
+    Db.pool.query('SELECT id, datetime, amount, description, comment FROM expenses WHERE user_id = $1 AND datetime >= $2 AND datetime < $3;', params)
+    .then((result) => {
+      resolve({
+        expenses: _.map(result.rows, normalizeRow)
+      })
+    })
+    .catch(reject)
   })
 }
 
@@ -96,6 +108,22 @@ const getExpense = (req, res) => {
   })
   .catch(e => {
     Errors.handleError(req, res, e, 'error-get-expense')
+  })
+}
+
+const getExpenseId = (id) => {
+  return new Promise((resolve, reject) => {
+    Db.pool.query('SELECT e.id, datetime, amount, description, comment, user_id, u.username, u.role AS user_role FROM expenses e JOIN users u ON e.user_id = u.id WHERE e.id = $1;', [id])
+    .then((result) => {
+      if (result.rows.length !== 1) {
+        reject(new Error('no-such-expense'))
+      } else {
+        resolve({
+          expense: normalizeRow(result.rows[0])
+        })
+      }
+    })
+    .catch(reject)
   })
 }
 
@@ -165,5 +193,7 @@ export default {
   listExpenses,
   getExpense,
   updateExpense,
-  deleteExpense
+  deleteExpense,
+  findExpenses,
+  getExpenseId,
 }

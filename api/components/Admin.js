@@ -1,6 +1,7 @@
 import Db from '../Database'
 import Errors from '../Errors'
 import Users from './Users'
+import Expenses from './Expenses'
 import Authentication from '../Authentication'
 import Promise from 'bluebird'
 import _ from 'lodash'
@@ -75,6 +76,40 @@ const markDeletedUser = (userId) => {
   return Db.pool.query('UPDATE users SET is_deleted=true WHERE id=$1', [userId])
 }
 
+const listUserExpenses = (req, res) => {
+  Users.findUser({ unknown: req.params.userId })
+  .then(({ user }) => ensurePermission({ user: req.user, resource: { role: user.role }, payload: user }))
+  .then((user) => {
+    Expenses.findExpenses(user.id, req.query)
+    .then(({ expenses }) => {
+      res.json({
+        success: true,
+        expenses
+      })
+    })
+    .catch(e => {
+      Errors.handleError(req, res, e, 'error-list-expenses')
+    })
+  })
+  .catch(e => {
+    Errors.handleError(req, res, e, 'no-such-user')
+  })
+}
+
+const getExpense = (req, res) => {
+  Expenses.getExpenseId(req.params.expenseId)
+  .then(({ expense }) => ensurePermission({ user: req.user, resource: { role: expense.user_role }, payload: expense }))
+  .then(( expense ) => {
+    res.json({
+      success: true,
+      expense
+    })
+  })
+  .catch(e => {
+    Errors.handleError(req, res, e, 'no-such-expense')
+  })
+}
+
 const ensurePermission = ({ user, resource, payload }) => {
   return new Promise((resolve, reject) => {
     const unauthorizedErr = new Error('unauthorized')
@@ -108,4 +143,6 @@ export default {
   getUser,
   updateUser,
   deleteUser,
+  listUserExpenses,
+  getExpense,
 }
