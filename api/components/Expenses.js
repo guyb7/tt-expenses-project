@@ -6,28 +6,38 @@ import uuid from 'uuid/v4'
 import _ from 'lodash'
 
 const createExpense = (req, res) => {
-  const expenseId = uuid()
-  const params = [
-    expenseId,
-    req.user.id,
-    moment(req.body.datetime).format(),
-    req.body.amount,
-    req.body.description || '',
-    req.body.comment || ''
-  ]
-  Db.pool.query('INSERT INTO expenses (id, user_id, datetime, amount, description, comment) VALUES ($1, $2, $3, $4, $5, $6);', params)
-  .then((result) => {
-    if (result.rowCount !== 1) {
-      reject(new Error())
-    } else {
-      res.json({
-        success: true,
-        expenseId
-      })
-    }
+  createExpenseToUser({ userId: req.user.id, expense: req.body })
+  .then(({ expenseId }) => {
+    res.json({
+      success: true,
+      expenseId
+    })
   })
   .catch(e => {
     Errors.handleError(req, res, e, 'error-creating-expense')
+  })
+}
+
+const createExpenseToUser = ({ userId, expense }) => {
+  return new Promise((resolve, reject) => {
+    const expenseId = uuid()
+    const params = [
+      expenseId,
+      userId,
+      moment(expense.datetime).format(),
+      expense.amount,
+      expense.description || '',
+      expense.comment || ''
+    ]
+    Db.pool.query('INSERT INTO expenses (id, user_id, datetime, amount, description, comment) VALUES ($1, $2, $3, $4, $5, $6);', params)
+    .then((result) => {
+      if (result.rowCount !== 1) {
+        reject()
+      } else {
+        resolve({ expenseId })
+      }
+    })
+    .catch(reject)
   })
 }
 
@@ -204,4 +214,5 @@ export default {
   findExpenses,
   getExpenseId,
   updateExpenseId,
+  createExpenseToUser,
 }

@@ -110,6 +110,20 @@ const getExpense = (req, res) => {
   })
 }
 
+const createExpenseForUser = (req, res) => {
+  Users.findUser({ unknown: req.params.userId })
+  .then(({ user }) => ensurePermission({ user: req.user, resource: { role: user.role }, payload: user }))
+  .then(( user ) => Expenses.createExpenseToUser({ userId: user.id, expense: req.body }))
+  .then(() => {
+    res.json({
+      success: true
+    })
+  })
+  .catch(e => {
+    Errors.handleError(req, res, e, 'no-such-user')
+  })
+}
+
 const updateExpense = (req, res) => {
   Expenses.getExpenseId(req.params.expenseId)
   .then(({ expense }) => ensurePermission({ user: req.user, resource: { role: expense.user_role }, payload: expense }))
@@ -159,5 +173,6 @@ export default {
   deleteUser,
   listUserExpenses,
   getExpense,
-  updateExpense
+  updateExpense,
+  createExpenseForUser,
 }
