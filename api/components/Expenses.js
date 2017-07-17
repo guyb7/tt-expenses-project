@@ -190,18 +190,28 @@ const updateExpenseId = ({ userId, expenseId, reqBody }) => {
 }
 
 const deleteExpense = (req, res) => {
-  Db.pool.query('DELETE FROM expenses WHERE user_id=$1 AND id=$2;', [req.user.id, req.params.expenseId])
-  .then((result) => {
-    if (result.rowCount !== 1) {
-      throw new Error()
-    } else {
-      res.json({
-        success: true
-      })
-    }
+  deleteExpenseId({ userId: req.user.id, expenseId: req.params.expenseId })
+  .then(() => {
+    res.json({
+      success: true
+    })
   })
   .catch(e => {
     Errors.handleError(req, res, e, 'error-delete-expense')
+  })
+}
+
+const deleteExpenseId = ({ userId, expenseId }) => {
+  return new Promise((resolve, reject) => {
+    Db.pool.query('DELETE FROM expenses WHERE user_id=$1 AND id=$2;', [userId, expenseId])
+    .then(result => {
+      if (result.rowCount !== 1) {
+        reject()
+      } else {
+        resolve()
+      }
+    })
+    .catch(reject)
   })
 }
 
@@ -215,4 +225,5 @@ export default {
   getExpenseId,
   updateExpenseId,
   createExpenseToUser,
+  deleteExpenseId
 }
