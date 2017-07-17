@@ -70,13 +70,20 @@ const register = (req, res) => {
   })
 }
 
-const findUser = ({ id, username }) => {
+const findUser = ({ id, username, unknown }) => {
   return new Promise((resolve, reject) => {
+    if (unknown) {
+      if (unknown.length === 36 ) {
+        id = unknown
+      } else {
+        username = unknown
+      }
+    }
     let queryPromise
     if (id) {
-      queryPromise = Db.pool.query('SELECT * FROM users WHERE id=$1 LIMIT 1', [id])
+      queryPromise = Db.pool.query('SELECT * FROM users WHERE id=$1 AND is_deleted=false LIMIT 1', [id])
     } else if (username) {
-      queryPromise = Db.pool.query('SELECT * FROM users WHERE username=$1 LIMIT 1', [username])
+      queryPromise = Db.pool.query('SELECT * FROM users WHERE username=$1 AND is_deleted=false LIMIT 1', [username])
     }
     queryPromise
     .then(users => {
@@ -103,18 +110,23 @@ const getCurrent = (req, res) => {
 }
 
 const update = (req, res) => {
-  Db.pool.query('UPDATE users SET name=$2 WHERE id=$1', [req.user.id, req.body.name])
+  updateUser(req.user.id, { name: req.body.name })
   .then(result => {
-    if (result.rowCount !== 1) {
-      throw new Error()
-    } else {
-      res.json({
-        success: true
-      })
-    }
+    res.json({
+      success: true
+    })
   })
   .catch(e => {
     Errors.handleError(req, res, e, 'error-updating-user')
+  })
+}
+
+const updateUser = (id, { name }) => {
+  return new Promise((resolve, reject) => {
+    Db.pool.query('UPDATE users SET name=$2 WHERE id=$1 AND is_deleted=false', [id, name])
+    .then(result => {
+      resolve()
+    })
   })
 }
 
@@ -122,5 +134,6 @@ export default {
   register,
   findUser,
   getCurrent,
-  update
+  update,
+  updateUser
 }

@@ -14,6 +14,7 @@ const errors = {
   'no-such-user': 'This user does not exist',
   'user-not-found': 'Could not find your user',
   'error-updating-user': 'Could not update your account',
+  'error-listing-users': 'Could not get the users list',
 }
 
 export default {

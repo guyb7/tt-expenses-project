@@ -5,14 +5,14 @@ import Login from './components/Login'
 import Users from './components/Users'
 import Expenses from './components/Expenses'
 
-const MountGuestRoutes = (app) => {
+const MountPublicRoutes = (app) => {
   app.post   ('/api/register', Users.register )
   app.post   ('/api/login', Login.login, Login.success, Login.error )
+  app.get    ('/api/logout', Login.logout )
 }
 
 const MountAPIRoutes = (app) => {
   const ensureLogin = Authentication.ensureLogin
-  app.get    ('/api/logout', Login.logout )
   app.get    ('/api/profile', ensureLogin, Users.getCurrent )
   app.put    ('/api/profile', ensureLogin, Users.update )
   app.get    ('/api/expenses', ensureLogin, Expenses.listExpenses )
@@ -24,17 +24,16 @@ const MountAPIRoutes = (app) => {
 
 const MountAdminRoutes = (app) => {
   const ensureAdmin = Authentication.ensureAdmin
-  app.get    ('/api/admin', ensureAdmin, Admin.test )
-  // app.get   ('/api/admin/users', ensureAdmin, Admin.listUsers )
-  // app.post  ('/api/admin/users', ensureAdmin, Admin.createUser )
-  // app.get   ('/api/admin/users/:userId', ensureAdmin, Admin.getUser )
-  // app.put   ('/api/admin/users/:userId', ensureAdmin, Admin.updateUser )
-  // app.delete('/api/admin/users/:userId', ensureAdmin, Admin.deleteUser )
-  // app.get   ('/api/admin/users/:userId/expenses', ensureAdmin, Admin.getUserExpenses )
-  // app.post  ('/api/admin/users/:userId/expenses', ensureAdmin, Admin.createExpenseForUser )
-  // app.get   ('/api/admin/expenses/:expenseId', ensureAdmin, Admin.getExpense )
-  // app.put   ('/api/admin/expenses/:expenseId', ensureAdmin, Admin.updateExpense )
-  // app.delete('/api/admin/expenses/:expenseId', ensureAdmin, Admin.deleteExpense )
+  app.get    ('/api/admin/users', ensureAdmin, Admin.listUsers )
+  app.post   ('/api/admin/users', ensureAdmin, Users.register )
+  app.get    ('/api/admin/users/:userId', ensureAdmin, Admin.getUser )
+  app.put    ('/api/admin/users/:userId', ensureAdmin, Admin.updateUser )
+  app.delete ('/api/admin/users/:userId', ensureAdmin, Admin.deleteUser )
+  // app.get    ('/api/admin/users/:userId/expenses', ensureAdmin, Admin.getUserExpenses )
+  // app.post   ('/api/admin/users/:userId/expenses', ensureAdmin, Admin.createExpenseForUser )
+  // app.get    ('/api/admin/expenses/:expenseId', ensureAdmin, Admin.getExpense )
+  // app.put    ('/api/admin/expenses/:expenseId', ensureAdmin, Admin.updateExpense )
+  // app.delete ('/api/admin/expenses/:expenseId', ensureAdmin, Admin.deleteExpense )
 }
 
 const MountClientRoutes = (app) => {
@@ -52,7 +51,7 @@ const MountClientRoutes = (app) => {
 
 export default {
   mount: (app) => {
-    MountGuestRoutes(app)
+    MountPublicRoutes(app)
     MountAPIRoutes(app)
     MountAdminRoutes(app)
     MountClientRoutes(app)

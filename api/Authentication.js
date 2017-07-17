@@ -3,6 +3,7 @@ import LocalStrategy from 'passport-local'
 import Promise from 'bluebird'
 import bcrypt from 'bcrypt'
 import _ from 'lodash'
+import Db from './Database'
 import Users from './components/Users'
 import Errors from './Errors'
 
@@ -79,6 +80,28 @@ const ensureAdmin = (req, res, next) => {
   })
 }
 
+const destroyUserSession = ({ userId, username }) => {
+  return new Promise((resolve, reject) => {
+    const query = { passport: {user: {}}}
+    if (!_.isNil(userId)) {
+      query.passport.user.id = userId
+    }
+    if (!_.isNil(username)) {
+      query.passport.user.username = username
+    }
+    if (_.keys(query.passport.user).length === 0) {
+      return resolve()
+    }
+    Db.pool.query('DELETE FROM expenses.user_sessions WHERE sess::jsonb @> $1::jsonb;', [query])
+      .then(res => {
+        resolve()
+      })
+      .catch(e => {
+        reject(e)
+      })
+  })
+}
+
 export default {
   mount: (app) => {
     SetupPassport(app)
@@ -86,7 +109,9 @@ export default {
 
   authenticate: passport.authenticate('local', { failWithError: true }),
 
-  ensureLogin: ensureLogin,
+  ensureLogin,
   
-  ensureAdmin: ensureAdmin
+  ensureAdmin,
+
+  destroyUserSession
 }
