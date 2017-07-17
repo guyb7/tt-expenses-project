@@ -110,6 +110,20 @@ const getExpense = (req, res) => {
   })
 }
 
+const updateExpense = (req, res) => {
+  Expenses.getExpenseId(req.params.expenseId)
+  .then(({ expense }) => ensurePermission({ user: req.user, resource: { role: expense.user_role }, payload: expense }))
+  .then(( expense ) => Expenses.updateExpenseId({ userId: expense.user_id, expenseId: expense.id, reqBody: req.body }))
+  .then(() => {
+    res.json({
+      success: true
+    })
+  })
+  .catch(e => {
+    Errors.handleError(req, res, e, 'no-such-expense')
+  })
+}
+
 const ensurePermission = ({ user, resource, payload }) => {
   return new Promise((resolve, reject) => {
     const unauthorizedErr = new Error('unauthorized')
@@ -145,4 +159,5 @@ export default {
   deleteUser,
   listUserExpenses,
   getExpense,
+  updateExpense
 }

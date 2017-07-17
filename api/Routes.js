@@ -32,7 +32,7 @@ const MountAdminRoutes = (app) => {
   app.get    ('/api/admin/users/:userId/expenses', ensureAdmin, Admin.listUserExpenses )
   app.get    ('/api/admin/expenses/:expenseId', ensureAdmin, Admin.getExpense )
   // app.post   ('/api/admin/users/:userId/expenses', ensureAdmin, Admin.createExpenseForUser )
-  // app.put    ('/api/admin/expenses/:expenseId', ensureAdmin, Admin.updateExpense )
+  app.put    ('/api/admin/expenses/:expenseId', ensureAdmin, Admin.updateExpense )
   // app.delete ('/api/admin/expenses/:expenseId', ensureAdmin, Admin.deleteExpense )
 }
 

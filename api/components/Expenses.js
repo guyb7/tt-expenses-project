@@ -128,47 +128,54 @@ const getExpenseId = (id) => {
 }
 
 const updateExpense = (req, res) => {
-  const sqlFields = {
-    // datetime: '2017-01-01 20:00:00',
-    // amount: 3.30,
-    // description: 'Party hats',
-    // comment: 'New year'
-  }
-  _.each(['datetime', 'amount', 'description', 'comment'], f => {
-    if (_.has(req.body, f)) {
-      if (f === 'datetime') {
-        sqlFields[f] = moment(req.body[f]).format()
-      } else {
-        sqlFields[f] = req.body[f]
-      }
-    }
-  })
-  if (_.keys(sqlFields).length === 0) {
-    // Nothing to update
-    return res.json({
+  updateExpenseId({ userId: req.user.id, expenseId: req.params.expenseId, reqBody: req.body })
+  .then(() => {
+    res.json({
       success: true
     })
-  }
-  const sql = []
-  const params = []
-  let n = 3
-  _.each(sqlFields, (v, k) => {
-    sql.push(k + '=$' + n)
-    params.push(v)
-    n++
-  })
-  Db.pool.query('UPDATE expenses SET ' + sql.join(', ') + ' WHERE user_id=$1 AND id=$2;', [req.user.id, req.params.expenseId, ...params])
-  .then((result) => {
-    if (result.rowCount !== 1) {
-      throw new Error()
-    } else {
-      res.json({
-        success: true
-      })
-    }
   })
   .catch(e => {
     Errors.handleError(req, res, e, 'error-update-expense')
+  })
+}
+
+const updateExpenseId = ({ userId, expenseId, reqBody }) => {
+  return new Promise((resolve, reject) => {
+    const sqlFields = {
+      // datetime: '2017-01-01 20:00:00',
+      // amount: 3.30,
+      // description: 'Party hats',
+      // comment: 'New year'
+    }
+    _.each(['datetime', 'amount', 'description', 'comment'], f => {
+      if (_.has(reqBody, f)) {
+        if (f === 'datetime') {
+          sqlFields[f] = moment(reqBody[f]).format()
+        } else {
+          sqlFields[f] = reqBody[f]
+        }
+      }
+    })
+    if (_.keys(sqlFields).length === 0) {
+      resolve() // Nothing to update
+    }
+    const sql = []
+    const params = []
+    let n = 3
+    _.each(sqlFields, (v, k) => {
+      sql.push(k + '=$' + n)
+      params.push(v)
+      n++
+    })
+    Db.pool.query('UPDATE expenses SET ' + sql.join(', ') + ' WHERE user_id=$1 AND id=$2;', [userId, expenseId, ...params])
+    .then((result) => {
+      if (result.rowCount !== 1) {
+        throw new Error()
+      } else {
+        resolve()
+      }
+    })
+    .catch(reject)
   })
 }
 
@@ -196,4 +203,5 @@ export default {
   deleteExpense,
   findExpenses,
   getExpenseId,
+  updateExpenseId,
 }
