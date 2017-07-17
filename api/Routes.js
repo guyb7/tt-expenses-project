@@ -6,6 +6,7 @@ import Users from './components/Users'
 import Expenses from './components/Expenses'
 
 const MountPublicRoutes = (app) => {
+  app.get    ('/api/status', (req, res) => res.json({ success: true }) )
   app.post   ('/api/register', Users.register )
   app.post   ('/api/login', Login.login, Login.success, Login.error )
   app.get    ('/api/logout', Login.logout )

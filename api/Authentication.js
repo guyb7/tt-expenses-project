@@ -92,7 +92,7 @@ const destroyUserSession = ({ userId, username }) => {
     if (_.keys(query.passport.user).length === 0) {
       return resolve()
     }
-    Db.pool.query('DELETE FROM expenses.user_sessions WHERE sess::jsonb @> $1::jsonb;', [query])
+    Db.pool.query('DELETE FROM user_sessions WHERE sess::jsonb @> $1::jsonb;', [query])
       .then(res => {
         resolve()
       })

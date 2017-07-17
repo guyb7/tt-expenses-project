@@ -67,7 +67,8 @@ CREATE TABLE users (
     username character varying NOT NULL,
     password character varying NOT NULL,
     name character varying NOT NULL,
-    role character varying NOT NULL
+    role character varying NOT NULL,
+    is_deleted boolean DEFAULT false NOT NULL
 );
 
 
@@ -103,6 +104,13 @@ ALTER TABLE ONLY users
 
 ALTER TABLE ONLY users
     ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: idx_not_deleted; Type: INDEX; Schema: expenses; Owner: expenses_admin
+--
+
+CREATE INDEX idx_not_deleted ON users USING btree (is_deleted);
 
 
 --
