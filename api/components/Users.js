@@ -45,13 +45,15 @@ const createNewUser = ({ req, hash }) => {
       req.body.name || 'User',
       req.body.role || 'user'
     ]
-    Db.pool.query('INSERT INTO users (id, username, password, name, role) VALUES ($1, $2, $3, $4, $5);', params, (err, result) => {
-      if (err || result.rowCount !== 1) {
+    Db.query('INSERT INTO users (id, username, password, name, role) VALUES ($1, $2, $3, $4, $5);', params)
+    .then(result => {
+      if (result.rowCount !== 1) {
         reject (new Error('error-creating-user'))
       } else {
         resolve({ req, userId })
       }
     })
+    .catch(reject)
   })
 }
 
@@ -81,9 +83,9 @@ const findUser = ({ id, username, unknown }) => {
     }
     let queryPromise
     if (id) {
-      queryPromise = Db.pool.query('SELECT * FROM users WHERE id=$1 AND is_deleted=false LIMIT 1', [id])
+      queryPromise = Db.query('SELECT * FROM users WHERE id=$1 AND is_deleted=false LIMIT 1', [id])
     } else if (username) {
-      queryPromise = Db.pool.query('SELECT * FROM users WHERE username=$1 AND is_deleted=false LIMIT 1', [username])
+      queryPromise = Db.query('SELECT * FROM users WHERE username=$1 AND is_deleted=false LIMIT 1', [username])
     }
     queryPromise
     .then(users => {
@@ -93,6 +95,7 @@ const findUser = ({ id, username, unknown }) => {
         resolve({ user: users.rows[0] })
       }
     })
+    .catch(reject)
   })
 }
 
@@ -123,10 +126,11 @@ const update = (req, res) => {
 
 const updateUser = (id, { name }) => {
   return new Promise((resolve, reject) => {
-    Db.pool.query('UPDATE users SET name=$2 WHERE id=$1 AND is_deleted=false', [id, name])
+    Db.query('UPDATE users SET name=$2 WHERE id=$1 AND is_deleted=false', [id, name])
     .then(result => {
       resolve()
     })
+    .catch(reject)
   })
 }
 

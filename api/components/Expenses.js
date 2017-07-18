@@ -29,7 +29,7 @@ const createExpenseToUser = ({ userId, expense }) => {
       expense.description || '',
       expense.comment || ''
     ]
-    Db.pool.query('INSERT INTO expenses (id, user_id, datetime, amount, description, comment) VALUES ($1, $2, $3, $4, $5, $6);', params)
+    Db.query('INSERT INTO expenses (id, user_id, datetime, amount, description, comment) VALUES ($1, $2, $3, $4, $5, $6);', params)
     .then((result) => {
       if (result.rowCount !== 1) {
         reject()
@@ -91,7 +91,7 @@ const findExpenses = (userId, query) => {
       range.from,
       range.until
     ]
-    Db.pool.query('SELECT id, datetime, amount, description, comment FROM expenses WHERE user_id = $1 AND datetime >= $2 AND datetime < $3;', params)
+    Db.query('SELECT id, datetime, amount, description, comment FROM expenses WHERE user_id = $1 AND datetime >= $2 AND datetime < $3;', params)
     .then((result) => {
       resolve({
         expenses: _.map(result.rows, normalizeRow)
@@ -106,7 +106,7 @@ const getExpense = (req, res) => {
     req.user.id,
     req.params.expenseId
   ]
-  Db.pool.query('SELECT id, datetime, amount, description, comment FROM expenses WHERE user_id = $1 AND id = $2;', params)
+  Db.query('SELECT id, datetime, amount, description, comment FROM expenses WHERE user_id = $1 AND id = $2;', params)
   .then((result) => {
     if (result.rows.length !== 1) {
       throw new Error('no-such-expense')
@@ -123,7 +123,7 @@ const getExpense = (req, res) => {
 
 const getExpenseId = (id) => {
   return new Promise((resolve, reject) => {
-    Db.pool.query('SELECT e.id, datetime, amount, description, comment, user_id, u.username, u.role AS user_role FROM expenses e JOIN users u ON e.user_id = u.id WHERE e.id = $1;', [id])
+    Db.query('SELECT e.id, datetime, amount, description, comment, user_id, u.username, u.role AS user_role FROM expenses e JOIN users u ON e.user_id = u.id WHERE e.id = $1;', [id])
     .then((result) => {
       if (result.rows.length !== 1) {
         reject(new Error('no-such-expense'))
@@ -177,7 +177,7 @@ const updateExpenseId = ({ userId, expenseId, reqBody }) => {
       params.push(v)
       n++
     })
-    Db.pool.query('UPDATE expenses SET ' + sql.join(', ') + ' WHERE user_id=$1 AND id=$2;', [userId, expenseId, ...params])
+    Db.query('UPDATE expenses SET ' + sql.join(', ') + ' WHERE user_id=$1 AND id=$2;', [userId, expenseId, ...params])
     .then((result) => {
       if (result.rowCount !== 1) {
         throw new Error()
@@ -203,7 +203,7 @@ const deleteExpense = (req, res) => {
 
 const deleteExpenseId = ({ userId, expenseId }) => {
   return new Promise((resolve, reject) => {
-    Db.pool.query('DELETE FROM expenses WHERE user_id=$1 AND id=$2;', [userId, expenseId])
+    Db.query('DELETE FROM expenses WHERE user_id=$1 AND id=$2;', [userId, expenseId])
     .then(result => {
       if (result.rowCount !== 1) {
         reject()

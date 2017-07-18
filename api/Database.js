@@ -22,5 +22,23 @@ const disconnect = () => {
 
 module.exports = {
   pool,
+  query: (query, params) => {
+    return new Promise((resolve, reject) => {
+      pool.connect()
+      .then(client => {
+        client.query(query, params).then(res => {
+          client.release()
+          resolve(res)
+        })
+        .catch(e => {
+          client.release()
+          reject(e)
+        })
+      })
+      .catch(e => {
+        reject(e)
+      })
+    })
+  },
   disconnect
 }

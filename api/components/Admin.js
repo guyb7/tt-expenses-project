@@ -9,9 +9,9 @@ import _ from 'lodash'
 const listUsers = (req, res) => {
   let queryPromise
   if (req.user.role === 'admin') {
-    queryPromise = Db.pool.query('SELECT id, username, name, role FROM users WHERE is_deleted=false')
+    queryPromise = Db.query('SELECT id, username, name, role FROM users WHERE is_deleted=false')
   } else {
-    queryPromise = Db.pool.query('SELECT id, username, name, role FROM users WHERE role != $1 AND role != $2 AND is_deleted=false', ['admin', 'manager'])
+    queryPromise = Db.query('SELECT id, username, name, role FROM users WHERE role != $1 AND role != $2 AND is_deleted=false', ['admin', 'manager'])
   }
   queryPromise
   .then(users => {
@@ -73,7 +73,7 @@ const deleteUser = (req, res) => {
 }
 
 const markDeletedUser = (userId) => {
-  return Db.pool.query('UPDATE users SET is_deleted=true WHERE id=$1', [userId])
+  return Db.query('UPDATE users SET is_deleted=true WHERE id=$1', [userId])
 }
 
 const listUserExpenses = (req, res) => {

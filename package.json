@@ -11,7 +11,7 @@
     "postinstall": "cd client && yarn install",
     "start": "babel-node index.js",
     "test": "jest",
-    "test:api": "ENV=test yarn jest api",
+    "test:api": "ENV=test yarn jest api --no-cache --runInBand --bail",
     "test:client": "cd client && yarn jest"
   },
   "engines": {

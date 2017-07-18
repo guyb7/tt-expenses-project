@@ -1,6 +1,8 @@
 import '../env'
 // process.env.PORT is 3003 - if changed, also modify testURL in package.json
 
+import Promise from 'bluebird'
+global.Promise = Promise
 import axios from 'axios'
 import axiosCookieJarSupport from '@3846masa/axios-cookiejar-support'
 import tough from 'tough-cookie'
@@ -13,7 +15,7 @@ axiosCookieJarSupport(axios)
 
 beforeAll(() => {
   const buildScriptSql = fs.readFileSync(__dirname + '/../db_migrations/latest.sql', 'utf8')
-  return Db.pool.query(buildScriptSql)
+  return Db.query(buildScriptSql)
     .then(Server.start)
     .catch(e => {
       if (e.message === 'schema "expenses" already exists') {
@@ -23,8 +25,8 @@ beforeAll(() => {
 })
 
 afterAll(() => {
-  Server.shutDown()
-    .then(Db.pool.query('DROP SCHEMA expenses CASCADE;'))
+  return Server.shutDown()
+    .then(Db.query('DROP SCHEMA expenses CASCADE;'))
     .then(Db.disconnect)
 })
 
@@ -58,6 +60,13 @@ describe('E2E Tests', () => {
       name: 'User1'
     }
 
+    const expense = {
+      "datetime": "2017-07-01 18:30:00",
+      "amount": 10.50,
+      "description": "Office supplies",
+      "comment": "Paper clips"
+    }
+
     test('New user is able to register', () => {
       expect.assertions(1)
       return userSession.post('/register', user)
@@ -83,36 +92,70 @@ describe('E2E Tests', () => {
       })
     })
 
-    xtest('User is able to update his profile', done => {
-      done()
+    test('Should fail', () => {
+      return expect(userSession.get('/fail')).rejects.toBeDefined();
     })
 
-    xtest('User is able to update his profile', done => {
-      done()
+    test('User is able to update his profile', () => {
+      const newName = 'User11'
+      expect.assertions(1)
+      return userSession.put('/profile', { name: newName })
+      .then(response => userSession.get('/profile'))
+      .then(response => expect(response.data.user.name).toEqual(newName))
     })
 
-    xtest('User is able to create an expense', done => {
-      done()
+    test('User is able to create an expense', () => {
+      expect.assertions(1)
+      return userSession.post('/expenses', expense)
+      .then(response => {
+        expect(response.data.expenseId).toBeDefined()
+        expense.id = response.data.expenseId
+      })
     })
 
-    xtest('User is able to find an expense', done => {
-      done()
+    test('User is able to find an expense', () => {
+      expect.assertions(1)
+      return userSession.get('/expenses?week=26&year=2017&day=monday')
+      .then(response => {
+        expect(response.data.expenses[0].id).toEqual(expense.id)
+      })
     })
 
-    xtest('User is able to view a specific expense', done => {
-      done()
+    test('User is able to view a specific expense', () => {
+      expect.assertions(1)
+      return userSession.get('/expenses/' + expense.id)
+      .then(response => {
+        expect(response.data.expense.description).toEqual(expense.description)
+      })
     })
 
-    xtest('User is able to update a specific expense', done => {
-      done()
+    test('User is able to update a specific expense', () => {
+      const newDescription = 'Pizza!'
+      expect.assertions(1)
+      return userSession.put('/expenses/' + expense.id, { description: newDescription })
+      .then(response => userSession.get('/expenses/' + expense.id))
+      .then(response => {
+        expect(response.data.expense.description).toEqual(newDescription)
+        expense.description = newDescription
+      })
     })
 
-    xtest('User is able to delete a specific expense', done => {
-      done()
+    test('User is able to delete a specific expense', () => {
+      expect.assertions(1)
+      return userSession.delete('/expenses/' + expense.id)
+      .then(response => userSession.get('/expenses'))
+      .then(response => {
+        expect(response.data.expenses.length).toEqual(0)
+      })
     })
 
-    xtest('User is able to logout', done => {
-      done()
+    test('User is able to logout', () => {
+      expect.assertions(1)
+      return userSession.get('/logout')
+      // .then(response => userSession.get('/profile'))
+      .then(response => {
+        expect(response.status).toEqual(200)
+      })
     })
   })
 
