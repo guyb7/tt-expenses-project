@@ -16,7 +16,7 @@ class NavBar extends Component {
       <AppBar
         title={this.props.title}
         onLeftIconButtonTouchTap={() => this.openDrawer()}
-        iconElementRight={<Avatar size={30}>Y</Avatar>}
+        iconElementRight={this.props.user.logged_in ? <Avatar size={30}>Y</Avatar> : <Avatar size={30}>?</Avatar>}
       />
     );
   }
@@ -24,7 +24,8 @@ class NavBar extends Component {
 
 const mapStateToProps = (state) => {
   return {
-    title: state.navbar.title
+    title: state.navbar.title,
+    user: state.user
   }
 }
 

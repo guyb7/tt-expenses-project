@@ -40,12 +40,14 @@ export function user(state = defaultUserState, action) {
     case 'LOGIN_FAILURE':
       return {
         ...state,
+        logged_in: false,
         is_loading: false
       }
     case 'LOGIN_SUCCESS':
       return {
         ...state,
         is_loading: false,
+        logged_in: true,
         username: action.result.username
       }
     case 'PROFILE_REQUEST':
@@ -62,6 +64,7 @@ export function user(state = defaultUserState, action) {
       return {
         ...state,
         is_loading: false,
+        logged_in: true,
         user_id: action.result.user_id,
         name: action.result.name,
         role: action.result.role
