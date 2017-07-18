@@ -45,25 +45,6 @@ describe('E2E Tests', () => {
     "comment": "Paper clips"
   }
 
-  const manager = {
-    username: 'manager1',
-    password: '12341234',
-    name: 'Manager1'
-  }
-  
-  const user2 = {
-    username: 'user2',
-    password: '12341234',
-    name: 'User2'
-  }
-
-  const expense2 = {
-    "datetime": "2017-07-01 18:30:00",
-    "amount": 2.50,
-    "description": "Soda",
-    "comment": "Pepsi"
-  }
-
   describe('API Sanity Tests', () => {
     test('Server is running', () => {
       expect.assertions(1)
@@ -173,6 +154,25 @@ describe('E2E Tests', () => {
   })
 
   describe('Manager User Flow', () => {
+    const manager = {
+      username: 'manager1',
+      password: '12341234',
+      name: 'Manager1'
+    }
+
+    const user2 = {
+      username: 'user2',
+      password: '12341234',
+      name: 'User2'
+    }
+
+    const expense2 = {
+      "datetime": "2017-07-01 18:30:00",
+      "amount": 2.50,
+      "description": "Soda",
+      "comment": "Pepsi"
+    }
+
     const managerCookies = new tough.CookieJar()
     const managerSession = axios.create({
       baseURL: BASE_URL,
@@ -269,10 +269,29 @@ describe('E2E Tests', () => {
       })
     })
 
-    xtest('Manager is able to list expenses of specific user', () => {
+    test('Manager is able to list expenses of a specific user', () => {
+      expect.assertions(1)
+      return managerSession.get('/admin/users/' + user2.username + '/expenses', { params: {
+        week: 26,
+        year: 2017,
+        day: 'monday'
+      }})
+      .then(response => {
+        expect(response.data.expenses[0].id).toEqual(expense2.id)
+      })
     })
 
-    xtest('Manager is able to delete an expense of another user', () => {
+    test('Manager is able to delete an expense of another user', () => {
+      expect.assertions(1)
+      return managerSession.delete('/admin/expenses/' + expense2.id)
+      .then(response => managerSession.get('/admin/users/' + user2.username + '/expenses', { params: {
+        week: 26,
+        year: 2017,
+        day: 'monday'
+      }}))
+      .then(response => {
+        expect(response.data.expenses.length).toEqual(0)
+      })
     })
 
     test('Manager is able to delete a specific user', () => {
@@ -289,42 +308,99 @@ describe('E2E Tests', () => {
   })
 
   describe('Admin User Flow', () => {
-    xtest('Admin is able to list managers', done => {
-      done()
+    const admin = {
+      username: 'admin1',
+      password: '12341234',
+      name: 'Admin1'
+    }
+
+    const manager2 = {
+      username: 'manager2',
+      password: '12341234',
+      name: 'Manager2',
+      role: 'manager'
+    }
+
+    const adminCookies = new tough.CookieJar()
+    const adminSession = axios.create({
+      baseURL: BASE_URL,
+      withCredentials: true,
+      jar: adminCookies,
+      timeout: 200,
+      validateStatus: (status) => {
+        return status < 500;
+      }
     })
 
-    xtest('Admin is able to create managers', done => {
-      done()
+    beforeAll(() => {
+      return adminSession.post('/register', admin)
+      .then(response => {
+        return Db.query('UPDATE users SET role=$2 WHERE username=$1;', [admin.username, 'admin'])
+      })
+      .then(response => adminSession.post('/login', admin))
     })
 
-    xtest('Admin is able to delete a manager', done => {
-      done()
+    test('Admin has a manger role', () => {
+      expect.assertions(1)
+      return adminSession.get('/profile')
+      .then(response => {
+        expect(response.data.user.role).toEqual('admin')
+      })
+    })
+
+    test('Admin is able to create managers', () => {
+      expect.assertions(2)
+      return adminSession.post('/admin/users', manager2)
+      .then(response => {
+        manager2.id = response.data.userId
+        return adminSession.get('/admin/users')
+      })
+      .then(response => adminSession.get('/admin/users/' + manager2.username))
+      .then(response => {
+        expect(response.data.user.id).toEqual(manager2.id)
+        expect(response.data.user.role).toEqual('manager')
+      })
+    })
+
+    test('Admin is able to list managers', () => {
+      expect.assertions(1)
+      return adminSession.get('/admin/users')
+      .then(response => {
+        const managers = response.data.users.filter(u => u.role === 'manager')
+        expect(managers.length).toBeGreaterThan(0)
+      })
+    })
+
+    test('Admin is able to delete a manager', () => {
+      expect.assertions(2)
+      return adminSession.delete('/admin/users/' + manager2.username)
+      .then(response => {
+        return adminSession.get('/admin/users/' + manager2.id)
+        .then(response => {
+          expect(response.data.success).toEqual(false)
+          expect(response.data.error.id).toEqual('no-such-user')
+        })
+      })
     })
   })
 
   describe('Security', () => {
-    xtest('Users cannot register with an existing username', done => {
-      done()
+    xtest('Users cannot register with an existing username', () => {
     })
 
-    xtest('Users cannot login with a wrong password', done => {
-      done()
+    xtest('Users cannot login with a wrong password', () => {
     })
 
-    xtest('Users cannot login after being deleted', done => {
-      done()
+    xtest('Users cannot login after being deleted', () => {
     })
 
-    xtest('Users cannot access other users', done => {
-      done()
+    xtest('Users cannot access other users', () => {
     })
 
-    xtest('Managers cannot access other managers or admins', done => {
-      done()
+    xtest('Managers cannot access other managers or admins', () => {
     })
 
-    xtest('Sessions are terminated after deleting users', done => {
-      done()
+    xtest('Sessions are terminated after deleting users', () => {
     })
   })
 
