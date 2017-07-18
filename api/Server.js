@@ -1,5 +1,6 @@
 import express from 'express'
 import bodyParser from 'body-parser'
+import Promise from 'bluebird'
 
 import Authentication from './Authentication'
 import Routes from './Routes'
@@ -12,16 +13,22 @@ app.use(bodyParser.json())
 
 export default {
   start: () => {
-    sess = Session.mount(app)
-    Authentication.mount(app)
-    Routes.mount(app)
-    serverInstance = app.listen(process.env.PORT, () => {
-      console.log('Expenses server is listening on port ' + process.env.PORT)
+    return new Promise((resolve, reject) => {
+      sess = Session.mount(app)
+      Authentication.mount(app)
+      Routes.mount(app)
+      serverInstance = app.listen(process.env.PORT, () => {
+        console.log('Expenses server is listening on port ' + process.env.PORT)
+        resolve()
+      })
     })
   },
 
   shutDown: () => {
-    console.log('Sutting down Expenses server')
-    serverInstance.close()
+    return new Promise((resolve, reject) => {
+      console.log('Sutting down Expenses server')
+      serverInstance.close()
+      resolve()
+    })
   }
 }
