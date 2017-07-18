@@ -10,6 +10,7 @@ export default {
     const options = {
       store: new pgSession({
         pool: Db.pool,
+        schemaName: 'expenses',
         tableName: 'user_sessions'
       }),
       name: 'session',

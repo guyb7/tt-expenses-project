@@ -86,6 +86,7 @@ REVOKE ALL ON DATABASE expenses_test_db FROM public;
 GRANT CONNECT ON DATABASE expenses_test_db TO expenses_admin;
 GRANT expenses_admin TO postgres WITH ADMIN OPTION;
 GRANT ALL ON SCHEMA expenses TO expenses_admin;
+SET search_path = expenses; -- Run this one as expenses_admin
 ```
 
 ## Views

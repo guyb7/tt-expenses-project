@@ -16,6 +16,7 @@ axiosCookieJarSupport(axios)
 beforeAll(() => {
   const buildScriptSql = fs.readFileSync(__dirname + '/../db_migrations/latest.sql', 'utf8')
   return Db.query(buildScriptSql)
+    .then(Db.query('SET search_path = expenses'))
     .then(Server.start)
     .catch(e => {
       if (e.message === 'schema "expenses" already exists') {
@@ -31,16 +32,31 @@ afterAll(() => {
 })
 
 describe('E2E Tests', () => {
+  const user = {
+    username: 'user1',
+    password: '12341234',
+    name: 'User1'
+  }
+
+  const expense = {
+    "datetime": "2017-07-01 18:30:00",
+    "amount": 10.50,
+    "description": "Office supplies",
+    "comment": "Paper clips"
+  }
+
+  const manager = {
+    username: 'manager1',
+    password: '12341234',
+    name: 'Manager1'
+  }
 
   describe('API Sanity Tests', () => {
-    test('Server is running', done => {
-      axios.get(BASE_URL + '/status')
-      .then((response) => {
+    test('Server is running', () => {
+      expect.assertions(1)
+      return axios.get(BASE_URL + '/status')
+      .then(response => {
         expect(response.data.success).toBe(true)
-        done()
-      })
-      .catch(error => {
-        console.log(error)
       })
     })
   })
@@ -53,19 +69,6 @@ describe('E2E Tests', () => {
       jar: userCookies,
       timeout: 200
     })
-
-    const user = {
-      username: 'user1',
-      password: '12341234',
-      name: 'User1'
-    }
-
-    const expense = {
-      "datetime": "2017-07-01 18:30:00",
-      "amount": 10.50,
-      "description": "Office supplies",
-      "comment": "Paper clips"
-    }
 
     test('New user is able to register', () => {
       expect.assertions(1)
@@ -92,24 +95,22 @@ describe('E2E Tests', () => {
       })
     })
 
-    test('Should fail', () => {
-      return expect(userSession.get('/fail')).rejects.toBeDefined();
-    })
-
     test('User is able to update his profile', () => {
       const newName = 'User11'
       expect.assertions(1)
       return userSession.put('/profile', { name: newName })
       .then(response => userSession.get('/profile'))
-      .then(response => expect(response.data.user.name).toEqual(newName))
+      .then(response => {
+        expect(response.data.user.name).toEqual(newName)
+      })
     })
 
     test('User is able to create an expense', () => {
       expect.assertions(1)
       return userSession.post('/expenses', expense)
       .then(response => {
-        expect(response.data.expenseId).toBeDefined()
         expense.id = response.data.expenseId
+        expect(response.data.expenseId).toBeDefined()
       })
     })
 
@@ -135,8 +136,8 @@ describe('E2E Tests', () => {
       return userSession.put('/expenses/' + expense.id, { description: newDescription })
       .then(response => userSession.get('/expenses/' + expense.id))
       .then(response => {
-        expect(response.data.expense.description).toEqual(newDescription)
         expense.description = newDescription
+        expect(response.data.expense.description).toEqual(newDescription)
       })
     })
 
@@ -152,7 +153,6 @@ describe('E2E Tests', () => {
     test('User is able to logout', () => {
       expect.assertions(1)
       return userSession.get('/logout')
-      // .then(response => userSession.get('/profile'))
       .then(response => {
         expect(response.status).toEqual(200)
       })
@@ -160,8 +160,36 @@ describe('E2E Tests', () => {
   })
 
   describe('Manager User Flow', () => {
-    xtest('Manager is able to list users', done => {
-      done()
+    const managerCookies = new tough.CookieJar()
+    const managerSession = axios.create({
+      baseURL: BASE_URL,
+      withCredentials: true,
+      jar: managerCookies,
+      timeout: 200
+    })
+
+    beforeAll(() => {
+      return managerSession.post('/register', manager)
+        .then(response => {
+          return Db.query('UPDATE users SET role=$2 WHERE username=$1;', [manager.username, 'manager'])
+        })
+        .then(response => managerSession.post('/login', manager))
+    })
+
+    test('Manager has a manger role', () => {
+      expect.assertions(1)
+      return managerSession.get('/profile')
+      .then(response => {
+        expect(response.data.user.role).toEqual('manager')
+      })
+    })
+
+    test('Manager is able to list users', () => {
+      expect.assertions(1)
+      return managerSession.get('/admin/users')
+      .then(response => {
+        expect(response.data.users[0].id).toEqual(user.id)
+      })
     })
 
     xtest('Manager is able to create users', done => {
