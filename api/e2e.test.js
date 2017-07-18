@@ -16,19 +16,19 @@ axiosCookieJarSupport(axios)
 beforeAll(() => {
   const buildScriptSql = fs.readFileSync(__dirname + '/../db_migrations/latest.sql', 'utf8')
   return Db.query(buildScriptSql)
-    .then(Db.query('SET search_path = expenses'))
-    .then(Server.start)
-    .catch(e => {
-      if (e.message === 'schema "expenses" already exists') {
-        console.log(`Make sure that the test DB is empty.\nMaybe the last run is not over or exited without cleaning?\nRun \`DROP SCHEMA expenses_test_db.expenses CASCADE;\` to drop the schema.`)
-      }
-    })
+  .then(Db.query('SET search_path = expenses'))
+  .then(Server.start)
+  .catch(e => {
+    if (e.message === 'schema "expenses" already exists') {
+      console.log(`Make sure that the test DB is empty.\nMaybe the last run is not over or exited without cleaning?\nRun \`DROP SCHEMA expenses_test_db.expenses CASCADE;\` to drop the schema.`)
+    }
+  })
 })
 
 afterAll(() => {
   return Server.shutDown()
-    .then(Db.query('DROP SCHEMA expenses CASCADE;'))
-    .then(Db.disconnect)
+  .then(Db.query('DROP SCHEMA expenses CASCADE;'))
+  .then(Db.disconnect)
 })
 
 describe('E2E Tests', () => {
@@ -43,6 +43,18 @@ describe('E2E Tests', () => {
     "amount": 10.50,
     "description": "Office supplies",
     "comment": "Paper clips"
+  }
+
+  const manager = {
+    username: 'manager1',
+    password: '12341234',
+    name: 'Manager1'
+  }
+
+  const admin = {
+    username: 'admin1',
+    password: '12341234',
+    name: 'Admin1'
   }
 
   describe('API Sanity Tests', () => {
@@ -154,12 +166,6 @@ describe('E2E Tests', () => {
   })
 
   describe('Manager User Flow', () => {
-    const manager = {
-      username: 'manager1',
-      password: '12341234',
-      name: 'Manager1'
-    }
-
     const user2 = {
       username: 'user2',
       password: '12341234',
@@ -308,12 +314,6 @@ describe('E2E Tests', () => {
   })
 
   describe('Admin User Flow', () => {
-    const admin = {
-      username: 'admin1',
-      password: '12341234',
-      name: 'Admin1'
-    }
-
     const manager2 = {
       username: 'manager2',
       password: '12341234',
@@ -385,23 +385,106 @@ describe('E2E Tests', () => {
   })
 
   describe('Security', () => {
-    xtest('Users cannot register with an existing username', () => {
+    const user3 = {
+      username: 'user3',
+      password: '12341234',
+      name: 'User3'
+    }
+    const user4 = {
+      username: 'user4',
+      password: '12341234',
+      name: 'User4'
+    }
+    const manager3 = {
+      username: 'manager3',
+      password: '12341234',
+      name: 'Manager3',
+      role: 'manager'
+    }
+
+    const userCookies = new tough.CookieJar()
+    const userSession = axios.create({
+      baseURL: BASE_URL,
+      withCredentials: true,
+      jar: userCookies,
+      timeout: 200,
+      validateStatus: (status) => {
+        return status < 500;
+      }
     })
 
-    xtest('Users cannot login with a wrong password', () => {
+    const adminCookies = new tough.CookieJar()
+    const adminSession = axios.create({
+      baseURL: BASE_URL,
+      withCredentials: true,
+      jar: adminCookies,
+      timeout: 200,
+      validateStatus: (status) => {
+        return status < 500;
+      }
     })
 
-    xtest('Users cannot login after being deleted', () => {
+    test('Users cannot register with an existing username', () => {
+      expect.assertions(2)
+      return userSession.post('/register', user3)
+      .then(response => userSession.post('/register', user3))
+      .then(response => {
+        expect(response.data.success).toEqual(false)
+        expect(response.data.error.id).toEqual('error-creating-user')
+      })
     })
 
-    xtest('Users cannot access other users', () => {
+    test('Users cannot login with a wrong password', () => {
+      expect.assertions(2)
+      return userSession.post('/login', {
+        username: user3.username,
+        password: user3.password + '_nope'
+      })
+      .then(response => {
+        expect(response.data.success).toEqual(false)
+        expect(response.data.error.id).toEqual('invalid-credentials')
+      })
     })
 
-    xtest('Managers cannot access other managers or admins', () => {
+    test('Users cannot login after being deleted', () => {
+      expect.assertions(2)
+      return adminSession.post('/login', admin)
+      .then(response => adminSession.delete('/admin/users/' + user3.username))
+      .then(response => {
+        return userSession.post('/login', user3)
+        .then(response => {
+          expect(response.data.success).toEqual(false)
+          expect(response.data.error.id).toEqual('invalid-credentials')
+        })
+      })
     })
 
-    xtest('Sessions are terminated after deleting users', () => {
+    test('Users cannot access other users', () => {
+      expect.assertions(2)
+      return userSession.post('/register', user4)
+      .then(response => userSession.post('/login', user4))
+      .then(response => userSession.get('/admin/users/' + user.username))
+      .then(response => {
+        expect(response.data.success).toEqual(false)
+        expect(response.data.error.id).toEqual('unauthorized')
+      })
+    })
+
+    test('Managers cannot access other managers or admins', () => {
+      expect.assertions(4)
+      return adminSession.post('/login', admin)
+      .then(response => adminSession.post('/admin/users', manager3))
+      .then(response => userSession.post('/login', manager3))
+      .then(response => userSession.get('/admin/users/' + manager.username))
+      .then(response => {
+        expect(response.data.success).toEqual(false)
+        expect(response.data.error.id).toEqual('unauthorized')
+      })
+      .then(response => userSession.get('/admin/users/' + admin.username))
+      .then(response => {
+        expect(response.data.success).toEqual(false)
+        expect(response.data.error.id).toEqual('unauthorized')
+      })
     })
   })
-
 })

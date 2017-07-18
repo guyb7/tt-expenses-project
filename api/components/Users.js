@@ -53,7 +53,13 @@ const createNewUser = ({ req, hash }) => {
         resolve({ req, userId })
       }
     })
-    .catch(reject)
+    .catch(e => {
+      if (e.message.match(/duplicate key/i)) {
+        reject(new Error('error-creating-user'))
+      } else {
+        reject(e)
+      }
+    })
   })
 }
 

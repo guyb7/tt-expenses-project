@@ -37,7 +37,6 @@ const SetupPassport = (app) => {
         done(null, user)
       })
       .catch(e => {
-        console.log('Login failure', e)
         done(null, false, { message: 'Incorrect username or password.' })
       })
     }

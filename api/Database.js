@@ -16,8 +16,8 @@ pool.on('error',  (err, client) => {
   console.error('idle client error', err.message, err.stack)
 })
 
-const disconnect = () => {
-  pool.end()
+const disconnect = async () => {
+  await pool.end()
 }
 
 module.exports = {
