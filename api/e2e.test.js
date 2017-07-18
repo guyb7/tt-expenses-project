@@ -2,15 +2,14 @@ import '../env'
 // process.env.PORT is 3003 - if changed, also modify testURL in package.json
 
 import axios from 'axios'
+import axiosCookieJarSupport from '@3846masa/axios-cookiejar-support'
+import tough from 'tough-cookie'
 import fs from 'fs'
 import Db from './Database'
 import Server from './Server'
 
-const instance = axios.create({
-  baseURL: 'http://127.0.0.1:3003/api/',
-  withCredentials: true,
-  timeout: 200
-})
+const BASE_URL = 'http://127.0.0.1:3003/api'
+axiosCookieJarSupport(axios)
 
 beforeAll(() => {
   const buildScriptSql = fs.readFileSync(__dirname + '/../db_migrations/latest.sql', 'utf8')
@@ -33,7 +32,7 @@ describe('E2E Tests', () => {
 
   describe('API Sanity Tests', () => {
     test('Server is running', done => {
-      instance.get('/status')
+      axios.get(BASE_URL + '/status')
       .then((response) => {
         expect(response.data.success).toBe(true)
         done()
@@ -45,23 +44,43 @@ describe('E2E Tests', () => {
   })
 
   describe('Regular User Flow', () => {
-    xtest('New user is able to register', done => {
-      instance.post('/register', { username: 'user1', password: '12341234' })
-      .then((response) => {
+    const userCookies = new tough.CookieJar()
+    const userSession = axios.create({
+      baseURL: BASE_URL,
+      withCredentials: true,
+      jar: userCookies,
+      timeout: 200
+    })
+
+    const user = {
+      username: 'user1',
+      password: '12341234',
+      name: 'User1'
+    }
+
+    test('New user is able to register', () => {
+      expect.assertions(1)
+      return userSession.post('/register', user)
+      .then(response => {
         expect(response.status).toBe(200)
-        done()
-      })
-      .catch(error => {
-        console.log(error)
       })
     })
 
-    xtest('User is able to login', done => {
-      done()
+    test('User is able to login', () => {
+      expect.assertions(1)
+      return userSession.post('/login', user)
+      .then(response => {
+        expect(response.status).toBe(200)
+      })
     })
 
-    xtest('User is able to get his profile', done => {
-      done()
+    test('User is able to get his profile', () => {
+      expect.assertions(1)
+      return userSession.get('/profile')
+      .then(response => {
+        user.id = response.data.user.id
+        expect(response.data.user.name).toEqual(user.name)
+      })
     })
 
     xtest('User is able to update his profile', done => {
@@ -150,6 +169,10 @@ describe('E2E Tests', () => {
   })
 
   describe('Security', () => {
+    xtest('Users cannot register with an existing username', done => {
+      done()
+    })
+
     xtest('Users cannot login with a wrong password', done => {
       done()
     })

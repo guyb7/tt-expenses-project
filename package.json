@@ -19,11 +19,13 @@
     "yarn": "^0.24.6"
   },
   "devDependencies": {
+    "@3846masa/axios-cookiejar-support": "^0.0.5",
     "axios": "^0.16.2",
-    "jest": "^20.0.4"
+    "jest": "^20.0.4",
+    "tough-cookie": "^2.3.2"
   },
   "jest": {
-     "testURL":"http://127.0.0.1:3003"
+    "testURL": "http://127.0.0.1:3003"
   },
   "dependencies": {
     "babel-cli": "^6.24.1",
