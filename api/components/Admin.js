@@ -114,9 +114,10 @@ const createExpenseForUser = (req, res) => {
   Users.findUser({ unknown: req.params.userId })
   .then(({ user }) => ensurePermission({ user: req.user, resource: { role: user.role }, payload: user }))
   .then(( user ) => Expenses.createExpenseToUser({ userId: user.id, expense: req.body }))
-  .then(() => {
+  .then(({ expenseId }) => {
     res.json({
-      success: true
+      success: true,
+      expenseId
     })
   })
   .catch(e => {

@@ -19,9 +19,11 @@ const errors = {
 
 export default {
   handleError: (req, res, err = new Error(), defaultMessage = 'something-went-wrong') => {
-    console.log('[ERR]', req.method, req.originalUrl)
-    console.log(req.body, req.user)
-    console.log(defaultMessage, err)
+    if (process.env.ENV === 'development') {
+      console.log('[ERR]', req.method, req.originalUrl)
+      console.log(req.body, req.user)
+      console.log(defaultMessage, err)
+    }
     res.status(401).json({
       success: false,
       error: {

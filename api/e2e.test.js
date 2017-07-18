@@ -50,6 +50,19 @@ describe('E2E Tests', () => {
     password: '12341234',
     name: 'Manager1'
   }
+  
+  const user2 = {
+    username: 'user2',
+    password: '12341234',
+    name: 'User2'
+  }
+
+  const expense2 = {
+    "datetime": "2017-07-01 18:30:00",
+    "amount": 2.50,
+    "description": "Soda",
+    "comment": "Pepsi"
+  }
 
   describe('API Sanity Tests', () => {
     test('Server is running', () => {
@@ -165,7 +178,10 @@ describe('E2E Tests', () => {
       baseURL: BASE_URL,
       withCredentials: true,
       jar: managerCookies,
-      timeout: 200
+      timeout: 200,
+      validateStatus: (status) => {
+        return status < 500;
+      }
     })
 
     beforeAll(() => {
@@ -192,36 +208,83 @@ describe('E2E Tests', () => {
       })
     })
 
-    xtest('Manager is able to create users', done => {
-      done()
+    test('Manager is able to create users', () => {
+      expect.assertions(1)
+      return managerSession.post('/admin/users', user2)
+      .then(response => {
+        user2.id = response.data.userId
+        return managerSession.get('/admin/users')
+      })
+      .then(response => {
+        expect(response.data.users.length).toEqual(2)
+      })
     })
 
-    xtest('Manager is able to view a specific user', done => {
-      done()
+    test('Manager is able to view a specific user', () => {
+      expect.assertions(1)
+      return managerSession.get('/admin/users/' + user2.username)
+      .then(response => {
+        expect(response.data.user.id).toEqual(user2.id)
+      })
     })
 
-    xtest('Manager is able to update a specific user', done => {
-      done()
+    test('Manager is able to update a specific user', () => {
+      const newName = 'User22'
+      expect.assertions(1)
+      return managerSession.put('/admin/users/' + user2.username, { name: newName })
+      .then(response => managerSession.get('/admin/users/' + user2.username))
+      .then(response => {
+        user2.name = newName
+        expect(response.data.user.name).toEqual(newName)
+      })
     })
 
-    xtest('Manager is able to delete a specific user', done => {
-      done()
+    test('Manager is able to create an expense for a specific user', () => {
+      expect.assertions(1)
+      return managerSession.post('/admin/users/' + user2.username + '/expenses', expense2)
+      .then(response => {
+        expense2.id = response.data.expenseId
+        expect(response.status).toEqual(200)
+      })
     })
 
-    xtest('Manager is able to list expenses of a specific user', done => {
-      done()
+    test('Manager is able to view an expense of another user', () => {
+      expect.assertions(1)
+      return managerSession.get('/admin/expenses/' + expense2.id)
+      .then(response => {
+        expect(response.data.expense.user_id).toEqual(user2.id)
+      })
     })
 
-    xtest('Manager is able to create an expense for a specific user', done => {
-      done()
+    test('Manager is able to update an expense of another user', () => {
+      const newDescription = 'Drinks!'
+      expect.assertions(1)
+      return managerSession.put('/admin/expenses/' + expense2.id, { description: newDescription })
+      .then(response => {
+        expense2.description = newDescription
+        return managerSession.get('/admin/expenses/' + expense2.id)
+      })
+      .then(response => {
+        expect(response.data.expense.decsription).toEqual(expense2.decsription)
+      })
     })
 
-    xtest('Manager is able to update an expense of a specific user', done => {
-      done()
+    xtest('Manager is able to list expenses of specific user', () => {
     })
 
-    xtest('Manager is able to delete an expense of a specific user', done => {
-      done()
+    xtest('Manager is able to delete an expense of another user', () => {
+    })
+
+    test('Manager is able to delete a specific user', () => {
+      expect.assertions(2)
+      return managerSession.delete('/admin/users/' + user2.username)
+      .then(response => {
+        return managerSession.get('/admin/users/' + user2.id)
+        .then(response => {
+          expect(response.data.success).toEqual(false)
+          expect(response.data.error.id).toEqual('no-such-user')
+        })
+      })
     })
   })
 
