@@ -57,7 +57,10 @@ class LoginForm extends React.Component {
         ...this.state,
         is_loading: true
       })
-      console.log('LOGIN', this.state.username, this.state.password)
+      this.props.onLogin({
+        username: this.state.username,
+        password: this.state.password
+      })
     }
   }
 
@@ -176,6 +179,17 @@ class Login extends React.Component {
       }, { })
   }
 
+  onLogin({ username, password }) {
+    this.props.dispatch(actionCreators.requestLogin({
+      username,
+      password,
+      onSuccess: () => { this.returnToURL() },
+      onFail: () => {
+        console.log('FAIL LOGIN')
+      }
+    }))
+  }
+
   render () {
     return (
       <div style={style.container}>
@@ -186,7 +200,7 @@ class Login extends React.Component {
         {
           !this.props.user.is_loading &&
           !this.props.user.logged_in &&
-          <LoginForm></LoginForm>
+          <LoginForm onLogin={params => { this.onLogin(params) }}></LoginForm>
         }
       </div>
     )

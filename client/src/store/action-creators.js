@@ -1,3 +1,4 @@
+import API from '../API/API'
 import Promise from 'bluebird'
 
 export function setDrawer(value) {
@@ -14,17 +15,20 @@ export function setNavTitle(value) {
   }
 }
 
-export function requestLogin({ username, password, successRedirect }) {
+export function requestLogin({ username, password, onSuccess, onFail }) {
   return {
     types: ['LOGIN_REQUEST', 'LOGIN_SUCCESS', 'LOGIN_FAILURE'],
     promise: () => {
       return new Promise((resolve, reject) => {
-        setTimeout(() => {
-          resolve({
-            success: true,
-            username
-          })
-        }, 200)
+        API.post('/login', { username, password })
+        .then(res => {
+          onSuccess(res)
+          resolve()
+        })
+        .catch(e => {
+          onFail(e)
+          reject(e)
+        })
       })
     }
   }
@@ -35,6 +39,10 @@ export function requestProfile({ successRedirect }) {
     types: ['PROFILE_REQUEST', 'PROFILE_SUCCESS', 'PROFILE_FAILURE'],
     promise: () => {
       return new Promise((resolve, reject) => {
+        // API.post('/login', { username: 'okay' })
+        //   .then(res => console.log('okay', res))
+        // API.post('/login', { username: 'fail' })
+        //   .then(res => console.log('fail', res))
         setTimeout(() => {
           // successRedirect()
           // resolve({

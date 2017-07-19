@@ -47,8 +47,7 @@ export function user(state = defaultUserState, action) {
       return {
         ...state,
         is_loading: false,
-        logged_in: true,
-        username: action.result.username
+        logged_in: true
       }
     case 'PROFILE_REQUEST':
       return {
