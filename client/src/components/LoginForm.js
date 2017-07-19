@@ -64,6 +64,15 @@ class LoginForm extends React.Component {
     }
   }
 
+  clearErrors() {
+    this.setState({
+      ...this.state,
+      username_error: '',
+      password_error: '',
+      other_error: ''
+    })
+  }
+
   usernameChange(e) {
     this.setState({
       ...this.state,
@@ -81,6 +90,7 @@ class LoginForm extends React.Component {
   }
 
   login() {
+    this.clearErrors()
     if (this.validateFields()) {
       this.setState({
         ...this.state,
@@ -113,13 +123,38 @@ class LoginForm extends React.Component {
   }
 
   register() {
+    this.clearErrors()
     if (this.validateFields()) {
       this.setState({
         ...this.state,
         is_loading: true
       })
-      console.log('REGISTER', this.state.username, this.state.password)
+      this.props.dispatch(actionCreators.requestRegister({
+        username: this.state.username,
+        password: this.state.password,
+        name: this.state.name,
+        onSuccess: () => { this.onRegisterSuccess() },
+        onFail: e => this.onRegisterFail(e)
+      }))
     }
+  }
+
+  onRegisterSuccess() {
+    this.props.dispatch(actionCreators.requestLogin({
+      username: this.state.username,
+      password: this.state.password,
+      onSuccess: () => { this.onLoginSuccess() },
+      onFail: e => this.onLoginFail(e)
+    }))
+  }
+
+  onRegisterFail(e) {
+    this.setState({
+      ...this.state,
+      is_loading: false,
+      other_error: e.message
+    })
+    console.log(e)
   }
 
   validateFields() {
@@ -163,7 +198,7 @@ class LoginForm extends React.Component {
     return (
       <Card style={style.container}>
         <CardText style={style.form}>
-          <Tabs>
+          <Tabs onChange={() => this.clearErrors()}>
             <Tab label="Login">
               <div style={style.fieldsContainer}>
                 <ErrorMessage text={this.state.other_error}></ErrorMessage>
@@ -192,6 +227,7 @@ class LoginForm extends React.Component {
             </Tab>
             <Tab label="Register" >
               <div style={style.fieldsContainer}>
+                <ErrorMessage text={this.state.other_error}></ErrorMessage>
                 <TextField
                   floatingLabelText="Username"
                   errorText={this.state.username_error}

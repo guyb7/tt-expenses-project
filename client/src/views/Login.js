@@ -22,7 +22,8 @@ class Login extends React.Component {
     this.props.dispatch(actionCreators.setNavTitle(''))
     if (this.props.user.logged_in !== true) {
       this.props.dispatch(actionCreators.requestProfile({
-        successRedirect: () => { this.returnToURL() }
+        onSuccess: () => { this.returnToURL() },
+        onFail: () => {}
       }))
     }
   }

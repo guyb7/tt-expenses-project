@@ -44,6 +44,10 @@ export function user(state = defaultUserState, action) {
         ...state,
         logged_in: true
       }
+    case 'REGISTER_REQUEST':
+    case 'REGISTER_FAILURE':
+    case 'REGISTER_SUCCESS':
+      return state
     case 'PROFILE_REQUEST':
       return {
         ...state,

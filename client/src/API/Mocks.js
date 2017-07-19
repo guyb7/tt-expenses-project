@@ -21,14 +21,21 @@ const mocks = {
     }
   },
   '/register': {
-    post: {
-      success: true
+    post: params => {
+      if (params.username === 'fail') {
+        return new Error('error-creating-user')
+      } else {
+        return {
+          success: true
+        }
+      }
     }
   },
   '/profile': {
-    post: {
-      success: true
-    }
+    // get: {
+    //   success: true
+    // },
+    get: new Error('not-found')
   },
 }
 export default (method, route, params) => {

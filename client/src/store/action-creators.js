@@ -34,25 +34,40 @@ export function requestLogin({ username, password, onSuccess, onFail }) {
   }
 }
 
-export function requestProfile({ successRedirect }) {
+export function requestRegister({ username, password, name, onSuccess, onFail }) {
+  return {
+    types: ['REGISTER_REQUEST', 'REGISTER_SUCCESS', 'REGISTER_FAILURE'],
+    promise: () => {
+      return new Promise((resolve, reject) => {
+        API.post('/register', { username, password, name })
+        .then(res => {
+          onSuccess(res)
+          resolve()
+          return null
+        })
+        .catch(e => {
+          onFail(e)
+          reject(e)
+        })
+      })
+    }
+  }
+}
+
+export function requestProfile({ onSuccess, onFail }) {
   return {
     types: ['PROFILE_REQUEST', 'PROFILE_SUCCESS', 'PROFILE_FAILURE'],
     promise: () => {
       return new Promise((resolve, reject) => {
-        // API.post('/login', { username: 'okay' })
-        //   .then(res => console.log('okay', res))
-        // API.post('/login', { username: 'fail' })
-        //   .then(res => console.log('fail', res))
-        setTimeout(() => {
-          // successRedirect()
-          // resolve({
-          //   success: true,
-          //   user_id: 1234,
-          //   name: 'User90',
-          //   role: 'user'
-          // })
-          reject(new Error('not-logged-in'))
-        }, 400)
+        API.get('/profile')
+        .then(res => {
+          onSuccess(res)
+          resolve()
+        })
+        .catch(e => {
+          onFail(e)
+          reject(e)
+        })
       })
     }
   }
