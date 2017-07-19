@@ -14,7 +14,7 @@ export function setNavTitle(value) {
   }
 }
 
-export function requestLogin({ username, password }) {
+export function requestLogin({ username, password, successRedirect }) {
   return {
     types: ['LOGIN_REQUEST', 'LOGIN_SUCCESS', 'LOGIN_FAILURE'],
     promise: () => {
@@ -30,19 +30,21 @@ export function requestLogin({ username, password }) {
   }
 }
 
-export function requestProfile() {
+export function requestProfile({ successRedirect }) {
   return {
     types: ['PROFILE_REQUEST', 'PROFILE_SUCCESS', 'PROFILE_FAILURE'],
     promise: () => {
       return new Promise((resolve, reject) => {
         setTimeout(() => {
-          resolve({
-            success: true,
-            user_id: 1234,
-            name: 'User90',
-            role: 'user'
-          })
-        }, 200)
+          // successRedirect()
+          // resolve({
+          //   success: true,
+          //   user_id: 1234,
+          //   name: 'User90',
+          //   role: 'user'
+          // })
+          reject(new Error('not-logged-in'))
+        }, 2000)
       })
     }
   }
