@@ -1,6 +1,8 @@
 import Promise from 'bluebird'
 import _ from 'lodash'
 
+const DELAY = 400
+
 const mocks = {
   '/status': {
     get: {
@@ -48,6 +50,6 @@ export default (method, route, params) => {
       } else {
         reject(response)
       }
-    }, 600)
+    }, DELAY)
   })
 }

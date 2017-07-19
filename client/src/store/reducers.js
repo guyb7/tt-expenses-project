@@ -33,20 +33,15 @@ const defaultUserState = {
 export function user(state = defaultUserState, action) {
   switch (action.type) {
     case 'LOGIN_REQUEST':
-      return {
-        ...state,
-        is_loading: true
-      }
+      return state
     case 'LOGIN_FAILURE':
       return {
         ...state,
-        logged_in: false,
-        is_loading: false
+        logged_in: false
       }
     case 'LOGIN_SUCCESS':
       return {
         ...state,
-        is_loading: false,
         logged_in: true
       }
     case 'PROFILE_REQUEST':

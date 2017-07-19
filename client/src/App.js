@@ -8,9 +8,9 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 
 import NavBar from './components/NavBar'
 import SideDrawer from './components/SideDrawer'
-import Home from './components/Home'
-import Login from './components/Login'
-import ComingSoon from './components/ComingSoon'
+import Home from './views/Home'
+import Login from './views/Login'
+import ComingSoon from './views/ComingSoon'
 
 const baseUrl = process.env.NODE_ENV.toUpperCase() === 'TEST' ? '' : '/app'
 

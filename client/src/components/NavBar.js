@@ -5,7 +5,6 @@ import { withRouter } from 'react-router-dom'
 import * as actionCreators from '../store/action-creators'
 
 import AppBar from 'material-ui/AppBar'
-import Avatar from 'material-ui/Avatar'
 
 class NavBar extends Component {
   openDrawer() {
@@ -35,7 +34,7 @@ class NavBar extends Component {
       <AppBar
         title={this.props.title}
         onLeftIconButtonTouchTap={() => this.openDrawer()}
-        iconElementRight={this.props.user.logged_in ? <Avatar size={30}>Y</Avatar> : <Avatar size={30}>?</Avatar>}
+        iconElementRight={this.props.user.logged_in ? <div>{this.props.user.username}</div> : null}
       />
     );
   }

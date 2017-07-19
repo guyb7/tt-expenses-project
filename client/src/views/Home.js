@@ -8,8 +8,6 @@ class Home extends React.Component {
     this.props.dispatch(actionCreators.setNavTitle('Home'))
   }
 
-  
-
   render () {
     return (
       <div>

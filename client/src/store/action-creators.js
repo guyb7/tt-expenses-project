@@ -52,7 +52,7 @@ export function requestProfile({ successRedirect }) {
           //   role: 'user'
           // })
           reject(new Error('not-logged-in'))
-        }, 2000)
+        }, 400)
       })
     }
   }
