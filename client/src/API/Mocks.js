@@ -55,7 +55,7 @@ const mocks = {
   '/profile': {
     get: params => {
       profileCalls++
-      if (profileCalls < 2) {
+      if (profileCalls < 1) {
         return {
           success: false,
           error: { id: 'session-expired', text: 'Your session has expired' }
@@ -69,6 +69,18 @@ const mocks = {
             name: "User1",
             role: "user"
           }
+        }
+      }
+    },
+    put: params => {
+      if (params.name === 'fail') {
+        return {
+          success: false,
+          error: { id: 'error-updating-user', text: 'Could not update your account' }
+        }
+      } else {
+        return {
+          success: true
         }
       }
     }

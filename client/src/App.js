@@ -10,6 +10,7 @@ import NavBar from './components/NavBar'
 import SideDrawer from './components/SideDrawer'
 import Home from './views/Home'
 import Login from './views/Login'
+import Profile from './views/Profile'
 import ComingSoon from './views/ComingSoon'
 
 const baseUrl = process.env.NODE_ENV.toUpperCase() === 'TEST' ? '' : '/app'
@@ -32,7 +33,7 @@ class App extends Component {
               <SideDrawer />
               <Route exact path="/" component={Home}/>
               <Route exact path="/login" component={Login}/>
-              <Route exact path="/profile" component={ComingSoon}/>
+              <Route exact path="/profile" component={Profile}/>
               <Route exact path="/expenses" component={ComingSoon}/>
               <Route exact path="/expenses/:expenseId" component={ComingSoon}/>
               <Route exact path="/admin" component={ComingSoon}/>

@@ -28,5 +28,7 @@ const handleRequest = (method, route, params) => {
 
 export default {
   get: (route, params) => handleRequest('get', route, params),
-  post: (route, params) => handleRequest('post', route, params)
+  post: (route, params) => handleRequest('post', route, params),
+  put: (route, params) => handleRequest('put', route, params),
+  delete: (route, params) => handleRequest('delete', route, params)
 }

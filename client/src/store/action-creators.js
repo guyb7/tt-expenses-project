@@ -103,6 +103,29 @@ export function requestProfile({ onSuccess, onFail }) {
   }
 }
 
+export function requestUpdateProfile({ name, onSuccess, onFail }) {
+  return {
+    types: ['PROFILE_UPDATE_REQUEST', 'PROFILE_UPDATE_SUCCESS', 'PROFILE_UPDATE_FAILURE'],
+    promise: () => {
+      return new Promise((resolve, reject) => {
+        API.put('/profile', { name })
+        .then(res => {
+          if (onSuccess) {
+            onSuccess({ name })
+          }
+          resolve({ name })
+        })
+        .catch(e => {
+          if (onFail) {
+            onFail(e)
+          }
+          reject(e)
+        })
+      })
+    }
+  }
+}
+
 export function loadExpenses() {
   return {
     types: ['LOAD_EXPENSES_REQUEST', 'LOAD_EXPENSES_SUCCESS', 'LOAD_EXPENSES_FAILURE'],

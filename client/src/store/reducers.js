@@ -75,6 +75,14 @@ export function user(state = defaultUserState, action) {
         name: action.result.data.user.name,
         role: action.result.data.user.role
       }
+    case 'PROFILE_UPDATE_REQUEST':
+    case 'PROFILE_UPDATE_FAILURE':
+      return state
+    case 'PROFILE_UPDATE_SUCCESS':
+      return {
+        ...state,
+        name: action.result.name
+      }
     default:
       return state
   }

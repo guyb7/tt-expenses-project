@@ -3,12 +3,12 @@ import { connect } from 'react-redux'
 
 import * as actionCreators from '../store/action-creators'
 
+import ErrorMessage from './ErrorMessage'
 import { Card, CardText } from 'material-ui/Card'
 import RaisedButton from 'material-ui/RaisedButton'
 import { Tabs, Tab } from 'material-ui/Tabs'
 import TextField from 'material-ui/TextField'
-import AlertError from 'material-ui/svg-icons/alert/error'
-import { red500 } from 'material-ui/styles/colors'
+
 
 const style = {
   container: {
@@ -28,26 +28,6 @@ const style = {
     marginTop: 20,
     marginBottom: 10,
     alignSelf: 'flex-end'
-  },
-  error: {
-    color: red500,
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center'
-  }
-}
-
-class ErrorMessage extends React.Component {
-  render() {
-    return(
-      <div className={this.props.text ? '' : 'hidden'}>
-        <div style={style.error}>
-          <AlertError color={red500} style={{ marginRight: 10 }}></AlertError>
-          {this.props.text}
-        </div>
-      </div>
-    )
   }
 }
 
