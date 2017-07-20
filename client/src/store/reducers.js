@@ -63,7 +63,7 @@ export function user(state = defaultUserState, action) {
         ...state,
         is_loading: false,
         logged_in: true,
-        user_id: action.result.user_id,
+        user_id: action.result.id,
         name: action.result.name,
         role: action.result.role
       }

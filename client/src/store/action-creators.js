@@ -62,7 +62,7 @@ export function requestProfile({ onSuccess, onFail }) {
         API.get('/profile')
         .then(res => {
           onSuccess(res)
-          resolve()
+          resolve(res.data)
         })
         .catch(e => {
           onFail(e)

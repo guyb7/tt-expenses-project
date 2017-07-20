@@ -23,7 +23,7 @@ class NavBar extends Component {
   checkToPromptLogin() {
     // If not on /login page, check if logged in and redirect to /login if not
     setImmediate(() => {
-    if (this.props.history.location.pathname !== '/login' && this.props.user.logged_in !== true) {
+      if (this.props.history.location.pathname !== '/login' && this.props.user.logged_in !== true) {
         this.props.history.push('/login?returnUrl=' + encodeURIComponent(this.props.history.location.pathname))
       }
     })
@@ -36,7 +36,7 @@ class NavBar extends Component {
         onLeftIconButtonTouchTap={() => this.openDrawer()}
         iconElementRight={this.props.user.logged_in ? <div>{this.props.user.username}</div> : null}
       />
-    );
+    )
   }
 }
 
