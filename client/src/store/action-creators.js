@@ -22,11 +22,33 @@ export function requestLogin({ username, password, onSuccess, onFail }) {
       return new Promise((resolve, reject) => {
         API.post('/login', { username, password })
         .then(res => {
-          onSuccess(res)
-          resolve()
+          if (onSuccess) {
+            onSuccess(res)
+          }
+          resolve(res)
         })
         .catch(e => {
-          onFail(e)
+          if (onFail) {
+            onFail(e)
+          }
+          reject(e)
+        })
+      })
+    }
+  }
+}
+
+export function requestLogout() {
+  return {
+    types: ['LOGOUT_REQUEST', 'LOGOUT_SUCCESS', 'LOGOUT_FAILURE'],
+    promise: () => {
+      return new Promise((resolve, reject) => {
+        API.get('/logout')
+        .then(res => {
+          window.location.href = '/'
+          resolve(res)
+        })
+        .catch(e => {
           reject(e)
         })
       })
@@ -41,12 +63,16 @@ export function requestRegister({ username, password, name, onSuccess, onFail })
       return new Promise((resolve, reject) => {
         API.post('/register', { username, password, name })
         .then(res => {
-          onSuccess(res)
-          resolve()
+          if (onSuccess) {
+            onSuccess(res)
+          }
+          resolve(res)
           return null
         })
         .catch(e => {
-          onFail(e)
+          if (onFail) {
+            onFail(e)
+          }
           reject(e)
         })
       })
@@ -61,11 +87,15 @@ export function requestProfile({ onSuccess, onFail }) {
       return new Promise((resolve, reject) => {
         API.get('/profile')
         .then(res => {
-          onSuccess(res)
-          resolve(res.data)
+          if (onSuccess) {
+            onSuccess(res)
+          }
+          resolve(res)
         })
         .catch(e => {
-          onFail(e)
+          if (onFail) {
+            onFail(e)
+          }
           reject(e)
         })
       })

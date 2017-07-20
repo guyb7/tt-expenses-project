@@ -106,11 +106,21 @@ class LoginForm extends React.Component {
   }
 
   onLoginSuccess() {
-    this.setState({
-      ...this.state,
-      is_loading: false
-    })
-    this.props.onSuccess()
+    this.props.dispatch(actionCreators.requestProfile({
+      onSuccess: response => {
+        this.setState({
+          ...this.state,
+          is_loading: false
+        })
+        this.props.onSuccess()
+      },
+      onFail: e => {
+        this.setState({
+          ...this.state,
+          is_loading: false
+        })
+      }
+    }))
   }
 
   onLoginFail(e) {

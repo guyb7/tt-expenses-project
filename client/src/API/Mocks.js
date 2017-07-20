@@ -11,6 +11,8 @@ function APIError(data) {
 }
 APIError.prototype = Error.prototype
 
+let profileCalls = 0
+
 const mocks = {
   '/status': {
     get: {
@@ -31,6 +33,11 @@ const mocks = {
       }
     }
   },
+  '/logout': {
+    get: {
+      success: true
+    }
+  },
   '/register': {
     post: params => {
       if (params.username === 'fail') {
@@ -46,38 +53,51 @@ const mocks = {
     }
   },
   '/profile': {
-    get: {
-      success: true,
-      user: {
-        id: "019eeb5e-7e8a-42ce-b50c-b30e389ec822",
-        username: "user",
-        name: "User1",
-        role: "user"
+    get: params => {
+      profileCalls++
+      if (profileCalls < 2) {
+        return {
+          success: false,
+          error: { id: 'session-expired', text: 'Your session has expired' }
+        }
+      } else {
+        return {
+          success: true,
+          user: {
+            id: "019eeb5e-7e8a-42ce-b50c-b30e389ec822",
+            username: "user",
+            name: "User1",
+            role: "user"
+          }
+        }
       }
-    },
-    // get: {
-    //   success: false,
-    //   error: { id: 'session-expired', text: 'Your session has expired' }
-    // }
+    }
   },
 }
+
 export default (method, route, params) => {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       const response = mocks[route][method]
       if (_.isFunction(response)) {
         const res = response(params)
+        console.log('MOCK API RESPONSE', method, route, res)
         if (res.success) {
-          resolve(res)
+          resolve({
+            status: res.success? 200 : 401,
+            data: res
+          })
         } else {
           reject(new APIError(res))
         }
       } else if (response.success === true) {
+        console.log('MOCK API RESPONSE', method, route, response)
         resolve({
           status: 200,
           data: response
         })
       } else {
+        console.log('MOCK API RESPONSE', method, route, response)
         reject(new APIError(response))
       }
     }, DELAY)

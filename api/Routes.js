@@ -47,6 +47,7 @@ const MountClientRoutes = (app) => {
   })
 
   app.use ('/app', express.static('client/build'))
+  app.use ('/public', express.static('client/build'))
   app.use(express.static('public'))
 }
 

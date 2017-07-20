@@ -4,7 +4,10 @@ import { withRouter } from 'react-router-dom'
 
 import * as actionCreators from '../store/action-creators'
 
+import ProfileMenu from './ProfileMenu'
 import AppBar from 'material-ui/AppBar'
+
+let maxRedirects = 10
 
 class NavBar extends Component {
   openDrawer() {
@@ -24,7 +27,11 @@ class NavBar extends Component {
     // If not on /login page, check if logged in and redirect to /login if not
     setImmediate(() => {
       if (this.props.history.location.pathname !== '/login' && this.props.user.logged_in !== true) {
-        this.props.history.push('/login?returnUrl=' + encodeURIComponent(this.props.history.location.pathname))
+        if (maxRedirects > 0) {
+          this.props.history.push('/login?returnUrl=' + encodeURIComponent(this.props.history.location.pathname))
+        } else {
+          maxRedirects--
+        }
       }
     })
   }
@@ -34,7 +41,7 @@ class NavBar extends Component {
       <AppBar
         title={this.props.title}
         onLeftIconButtonTouchTap={() => this.openDrawer()}
-        iconElementRight={this.props.user.logged_in ? <div>{this.props.user.username}</div> : null}
+        iconElementRight={this.props.user.logged_in ? <ProfileMenu></ProfileMenu> : null}
       />
     )
   }

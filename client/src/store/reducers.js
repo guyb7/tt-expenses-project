@@ -44,6 +44,13 @@ export function user(state = defaultUserState, action) {
         ...state,
         logged_in: true
       }
+    case 'LOGOUT_REQUEST':
+    case 'LOGOUT_FAILURE':
+    case 'LOGOUT_SUCCESS':
+      return {
+        ...state,
+        logged_in: false
+      }
     case 'REGISTER_REQUEST':
     case 'REGISTER_FAILURE':
     case 'REGISTER_SUCCESS':
@@ -63,9 +70,10 @@ export function user(state = defaultUserState, action) {
         ...state,
         is_loading: false,
         logged_in: true,
-        user_id: action.result.id,
-        name: action.result.name,
-        role: action.result.role
+        user_id: action.result.data.user.id,
+        username: action.result.data.user.username,
+        name: action.result.data.user.name,
+        role: action.result.data.user.role
       }
     default:
       return state
