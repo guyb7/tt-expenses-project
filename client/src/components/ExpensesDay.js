@@ -59,11 +59,11 @@ const style = {
 
 export default class ExpensesDay extends React.Component {
   monthDay(date) {
-    return moment(date).utc().format('D')
+    return moment(date).format('D')
   }
 
   weekDay(date) {
-    return moment(date).utc().format('ddd')
+    return moment(date).format('ddd')
   }
 
   render () {

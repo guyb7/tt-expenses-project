@@ -101,7 +101,13 @@ const mocks = {
             "datetime": "2017-07-01T18:30:00+00:00",
             "amount": "10.5",
             "description": "Stuff",
-            "comment": "Comment"
+            "comment": "Comment\nNew line!"
+          }, {
+            "id": "22222222-dca3-4846-849a-09e12251db9d",
+            "datetime": "2017-06-28T10:00:00+00:00",
+            "amount": "99.99",
+            "description": "No comment",
+            "comment": ""
           }
         ]
       }
