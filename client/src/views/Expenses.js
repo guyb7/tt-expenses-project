@@ -1,9 +1,10 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import moment from 'moment'
+import _ from 'lodash'
 
-// import API from '../API/API'
-// import * as actionCreators from '../store/action-creators'
+import API from '../API/API'
+import * as actionCreators from '../store/action-creators'
 
 import ExpensesWeek from '../components/ExpensesWeek'
 import FloatingActionButton from 'material-ui/FloatingActionButton'
@@ -14,7 +15,7 @@ const style = {
     height: '100%'
   },
   fab: {
-    position: 'absolute',
+    position: 'fixed',
     bottom: 15,
     right: 15
   }
@@ -25,40 +26,87 @@ class Expenses extends React.Component {
     super(props)
     this.state = {
       is_loading: false,
-      year: moment().year(),
-      week: moment().week(),
+      year: 2017,
+      week: 26,
+      // year: moment().year(),
+      // week: moment().week(),
       expenses: [],
-      days: [
-        {
-          date: '2017-07-20', // Should be moment
-          expenses: [
-            {
-              id: '1234',
-              title: 'Expense title',
-              time: '18:00' // Should be moment
-            }
-          ]
-        },
-        {
-          date: '2017-07-21', // Should be moment
-          expenses: [
-            {
-              id: '4321',
-              title: 'Expense title 2',
-              time: '12:30' // Should be moment
-            }
-          ]
-        }
-      ],
       firstWeekDay: 'monday'
     }
+  }
+
+  componentDidMount() {
+    this.props.dispatch(actionCreators.setNavTitle('Expenses'))
+    this.getExpenses()
+  }
+
+  getExpenses() {
+    this.setState({
+      ...this.state,
+      is_loading: true
+    })
+    API.get('/expenses', {
+      week: this.state.week,
+      year: this.state.year,
+      day: this.state.firstWeekDay
+    })
+    .then(res => {
+      this.setState({
+        ...this.state,
+        is_loading: false,
+        expenses: res.data.expenses
+      })
+    })
+    .catch(e => {
+      console.log('e', e)
+      this.setState({
+        ...this.state,
+        is_loading: false
+      })
+    })
+  }
+
+  calcDays() {
+    console.log('Recalculating')
+    const daysMap = {}
+    const firstDay = moment()
+      .year(this.state.year)
+      .week(this.state.week)
+      .day(this.state.firstWeekDay)
+    _.times(7, n => {
+      const day = firstDay.add('days', 1).format('YYYY-MM-DD')
+      daysMap[day] = []
+    })
+    _.each(this.state.expenses, e => {
+      const date = moment(e.datetime).utc()
+      const day = date.format('YYYY-MM-DD')
+      if (daysMap[day]) {
+        daysMap[day].push({
+          id: e.id,
+          time: date.format('HH:mm'),
+          amount: e.amount,
+          description: e.description,
+          comment: e.comment
+        })
+      } else {
+        console.log('Day out of range', day, e)
+      }
+    })
+    const days = []
+    _.each(daysMap, (v, k) => {
+      days.push({
+        date: k,
+        expenses: v
+      })
+    })
+    return days
   }
 
   render () {
     return (
       <div style={style.container}>
         Year: {this.state.year} | Week: {this.state.week}
-        <ExpensesWeek days={this.state.days} />
+        <ExpensesWeek days={this.calcDays()} />
         <FloatingActionButton secondary={true} style={style.fab}>
           <ContentAdd />
         </FloatingActionButton>

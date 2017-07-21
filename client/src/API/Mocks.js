@@ -85,6 +85,28 @@ const mocks = {
       }
     }
   },
+  '/expenses': {
+    get: params => {
+      return {
+        "success": true,
+        "expenses": [
+          {
+            "id": "cac44371-a922-4906-8563-1ca53e63bbe7",
+            "datetime": "2017-07-01T15:30:00+00:00",
+            "amount": "3.0",
+            "description": "Food",
+            "comment": "Burger"
+          }, {
+            "id": "1fbe2e26-dca3-4846-849a-09e12251db9d",
+            "datetime": "2017-07-01T18:30:00+00:00",
+            "amount": "10.5",
+            "description": "Stuff",
+            "comment": "Comment"
+          }
+        ]
+      }
+    }
+  }
 }
 
 export default (method, route, params) => {

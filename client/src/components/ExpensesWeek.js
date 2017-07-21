@@ -4,6 +4,11 @@ import moment from 'moment'
 import ExpensesDay from './ExpensesDay'
 
 const style = {
+  container: {
+    maxWidth: 600,
+    marginLeft: 'auto',
+    marginRight: 'auto',
+  }
 }
 
 export default class ExpensesWeek extends React.Component {
