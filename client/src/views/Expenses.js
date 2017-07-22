@@ -11,9 +11,13 @@ import FloatingActionButton from 'material-ui/FloatingActionButton'
 import ContentAdd from 'material-ui/svg-icons/content/add'
 import ArrowLeft from 'material-ui/svg-icons/navigation/chevron-left'
 import ArrowRight from 'material-ui/svg-icons/navigation/chevron-right'
+import PrintIcon from 'material-ui/svg-icons/action/print'
 import FlatButton from 'material-ui/FlatButton'
 import { Toolbar, ToolbarGroup } from 'material-ui/Toolbar'
 import DatePicker from 'material-ui/DatePicker'
+import SearchIcon from 'material-ui/svg-icons/action/search'
+import TextField from 'material-ui/TextField'
+import { grey400 } from 'material-ui/styles/colors'
 
 const style = {
   container: {
@@ -41,6 +45,14 @@ const style = {
     margin: 0,
     paddingLeft: 20,
     paddingRight: 20,
+  },
+  searchContainer: {
+    maxWidth: 300,
+    marginLeft: 'auto',
+    marginRight: 'auto'
+  },
+  searchIcon: {
+    color: grey400
   }
 }
 
@@ -51,7 +63,8 @@ class Expenses extends React.Component {
       is_loading: false,
       firstDay: moment().day('monday').hour(0).minute(0).second(0),
       expenses: [],
-      firstWeekDay: 'monday'
+      firstWeekDay: 'monday',
+      filter: ''
     }
   }
 
@@ -119,13 +132,15 @@ class Expenses extends React.Component {
       const date = moment(e.datetime).utc()
       const day = date.format('YYYY-MM-DD')
       if (daysMap[day]) {
-        daysMap[day].push({
-          id: e.id,
-          time: date.format('HH:mm'),
-          amount: e.amount,
-          description: e.description,
-          comment: e.comment
-        })
+        if (this.matchesFilter(e)) {
+          daysMap[day].push({
+            id: e.id,
+            time: date.format('HH:mm'),
+            amount: e.amount,
+            description: e.description,
+            comment: e.comment
+          })
+        }
       } else {
         console.log('Day out of range', day, e)
       }
@@ -178,6 +193,26 @@ class Expenses extends React.Component {
     })
   }
 
+  matchesFilter(expense) {
+    if (this.state.filter.length === 0) {
+      return true
+    } else {
+      const re = new RegExp(this.state.filter, ['i'])
+      if (expense.description.match(re) || expense.comment.match(re)) {
+        return true
+      } else {
+        return false
+      }
+    }
+  }
+
+  onFilterChange(e) {
+    this.setState({
+      ...this.state,
+      filter: e.target.value
+    })
+  }
+
   render () {
     return (
       <div style={style.container}>
@@ -197,6 +232,7 @@ class Expenses extends React.Component {
               onTouchTap={e => this.setDateNextWeek()} />
           </ToolbarGroup>
           <ToolbarGroup>
+            <FlatButton icon={<PrintIcon/>} />
             <FlatButton label="Today" onTouchTap={e => this.setDateToday()} />
           </ToolbarGroup>
         </Toolbar>
@@ -206,7 +242,18 @@ class Expenses extends React.Component {
           ref={(input) => { this.dateInput = input }}
           onChange={(e, date) => this.onDatepickerUpdate(date)}
           value={this.state.firstDay.toDate()} />
-        <ExpensesWeek days={this.calcDays()} />
+        <div style={style.searchContainer}>
+          <TextField
+            hintText="Filter"
+            value={this.state.filter}
+            onChange={e => this.onFilterChange(e)}
+          />
+          <SearchIcon style={style.searchIcon} />
+        </div>
+        {
+          this.state.is_loading !== true &&
+          <ExpensesWeek days={this.calcDays()} />
+        }
         <FloatingActionButton secondary={true} style={style.fab}>
           <ContentAdd />
         </FloatingActionButton>

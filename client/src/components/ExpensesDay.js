@@ -93,10 +93,13 @@ export default class ExpensesDay extends React.Component {
               </div>
             }
           </div>
-          <FlatButton
-            style={style.addButton}
-            label="Add"
-          />
+          {
+            false &&
+            <FlatButton
+              style={style.addButton}
+              label="Add"
+            />
+          }
         </div>
       </Card>
     )
