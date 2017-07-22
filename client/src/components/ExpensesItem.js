@@ -76,9 +76,12 @@ export default class ExpensesItem extends React.Component {
 
   render () {
     return (
-      <div style={this.containerStyle()} onMouseEnter={() => this.mouseOver()} onMouseLeave={() => this.mouseOut()}>
+      <div style={this.containerStyle()}
+        onClick={() => this.props.onExpenseOpen(this.props.expense)}
+        onMouseEnter={() => this.mouseOver()}
+        onMouseLeave={() => this.mouseOut()}>
         <div style={style.time}>
-          {this.props.expense.time}
+          {this.props.expense.datetime.format('HH:mm')}
         </div>
         <div style={style.amount}>
           ${this.props.expense.amount}

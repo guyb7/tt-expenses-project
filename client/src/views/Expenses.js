@@ -138,7 +138,7 @@ class Expenses extends React.Component {
         if (this.matchesFilter(e)) {
           daysMap[day].push({
             id: e.id,
-            time: date.format('HH:mm'),
+            datetime: date,
             amount: e.amount,
             description: e.description,
             comment: e.comment
@@ -216,15 +216,18 @@ class Expenses extends React.Component {
     })
   }
 
-  openNewExpenseDialog() {
+  openNewExpenseDialog(expense) {
     this.setState({
       ...this.state,
       expenseDialogOpen: true,
-      expenseDialogData: {}
+      expenseDialogData: expense || {}
     })
   }
 
   onExpenseUpdate(expense) {
+    if (expense.is_deleted === true) {
+      return this.deleteExpense(expense.id)
+    }
     const newExpenses = []
     let foundExistsing = false
     // Update if expense exists, otherwise push new
@@ -243,6 +246,14 @@ class Expenses extends React.Component {
       ...this.state,
       expenseDialogOpen: false,
       expenses: newExpenses
+    })
+  }
+
+  deleteExpense(expenseId) {
+    this.setState({
+      ...this.state,
+      expenseDialogOpen: false,
+      expenses: _.filter(this.state.expenses, e => e.id !== expenseId)
     })
   }
 
@@ -285,7 +296,7 @@ class Expenses extends React.Component {
         </div>
         {
           this.state.is_loading !== true &&
-          <ExpensesWeek days={this.calcDays()} />
+          <ExpensesWeek days={this.calcDays()} onExpenseOpen={e => this.openNewExpenseDialog(e)} />
         }
         <FloatingActionButton
           onTouchTap={e => this.openNewExpenseDialog()}

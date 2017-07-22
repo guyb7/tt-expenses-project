@@ -18,7 +18,7 @@ export default class ExpensesWeek extends React.Component {
         {
           this.props.days.map(d => {
             return (
-              <ExpensesDay day={d} key={d.date} />
+              <ExpensesDay day={d} key={d.date} onExpenseOpen={this.props.onExpenseOpen} />
             )
           })
         }

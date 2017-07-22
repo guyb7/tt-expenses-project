@@ -131,6 +131,11 @@ const mocks = {
       return {
         success: true
       }
+    },
+    delete: params => {
+      return {
+        success: true
+      }
     }
   }
 }

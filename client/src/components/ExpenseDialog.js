@@ -17,7 +17,7 @@ const style = {
 
 const emptyExpense = {
   id: false,
-  datetime: moment().minute(0).second(0).millisecond(0),
+  datetime: moment().utc().minute(0).second(0).millisecond(0),
   amount: 0,
   description: '',
   comment: ''
@@ -59,7 +59,8 @@ export default class ExpensesDialog extends React.Component {
       error_message: ''
     })
     const expense = {
-      datetime: this.state.datetime,
+      // Automatically adding timeszone offset to store in UTC timezone
+      datetime: this.state.datetime.add(moment().utcOffset(), 'minutes'),
       amount: this.state.amount,
       description: this.state.description,
       comment: this.state.comment
@@ -97,9 +98,25 @@ export default class ExpensesDialog extends React.Component {
     }
   }
 
+  deleteExpense() {
+    API.delete('/expenses/' + this.state.id)
+    .then(res => {
+      if (this.props.onSuccess) {
+        this.props.onSuccess({
+          id: this.state.id,
+          is_deleted: true
+        })
+      }
+      this.handleClose()
+    })
+    .catch(e => {
+      this.setError(e.message)
+    })
+  }
+
   dateChange(date) {
-    const prevDate = moment(date)
-    const newDate = moment(this.state.datetime)
+    const prevDate = moment(date).utc()
+    const newDate = moment(this.state.datetime).utc()
       .year(prevDate.year())
       .month(prevDate.month())
       .date(prevDate.date())
@@ -110,8 +127,8 @@ export default class ExpensesDialog extends React.Component {
   }
 
   timeChange(date) {
-    const prevDate = moment(date)
-    const newDate = moment(this.state.datetime)
+    const prevDate = moment(date).utc()
+    const newDate = moment(this.state.datetime).utc()
       .hour(prevDate.hour())
       .minute(prevDate.minute())
     this.setState({
@@ -155,14 +172,22 @@ export default class ExpensesDialog extends React.Component {
         label="Cancel"
         disabled={this.state.is_loading}
         onTouchTap={() => this.handleClose()}
-      />,
-      <FlatButton
-        label="Save"
-        primary={true}
-        disabled={this.state.is_loading}
-        onTouchTap={() => this.saveExpense()}
-      />,
+      />
     ]
+    if (this.state.id) {
+      actions.push(<FlatButton
+        label="Delete"
+        secondary={true}
+        disabled={this.state.is_loading}
+        onTouchTap={() => this.deleteExpense()}
+      />)
+    }
+    actions.push(<FlatButton
+      label="Save"
+      primary={true}
+      disabled={this.state.is_loading}
+      onTouchTap={() => this.saveExpense()}
+    />)
 
     return (
       <Dialog

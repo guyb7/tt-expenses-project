@@ -82,7 +82,7 @@ export default class ExpensesDay extends React.Component {
             {
               this.props.day.expenses.map(e => {
                 return (
-                  <ExpensesItem expense={e} key={e.id} />
+                  <ExpensesItem expense={e} key={e.id} onExpenseOpen={this.props.onExpenseOpen} />
                 )
               })
             }
