@@ -270,7 +270,7 @@ class Expenses extends React.Component {
               style={style.datePickBtn}
               label={this.weekRangeText()}
               onTouchTap={e => this.openDatepicker()} />
-            <FlatButton style={style.arrowButton}
+            <FlatButton
               style={style.dateNextBtn}
               icon={<ArrowRight/>}
               onTouchTap={e => this.setDateNextWeek()} />

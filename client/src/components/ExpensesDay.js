@@ -3,7 +3,7 @@ import moment from 'moment'
 
 import ExpensesItem from './ExpensesItem'
 import FlatButton from 'material-ui/FlatButton'
-import { Card, CardText } from 'material-ui/Card';
+import { Card } from 'material-ui/Card';
 import { teal500, grey200, grey400, grey700 } from 'material-ui/styles/colors'
 
 const style = {

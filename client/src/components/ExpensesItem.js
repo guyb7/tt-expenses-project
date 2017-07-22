@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { teal50, teal500, grey200, grey400, grey700 } from 'material-ui/styles/colors'
+import { teal50, grey400, grey700 } from 'material-ui/styles/colors'
 
 const style = {
   container: {

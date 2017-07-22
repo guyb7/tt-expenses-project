@@ -10,11 +10,6 @@ import TextField from 'material-ui/TextField'
 import DatePicker from 'material-ui/DatePicker'
 import TimePicker from 'material-ui/TimePicker'
 
-const style = {
-  container: {
-  }
-}
-
 const emptyExpense = {
   id: false,
   datetime: moment().utc().minute(0).second(0).millisecond(0),

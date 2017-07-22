@@ -130,3 +130,11 @@ DELETE __/expenses/:expenseId__
 Call `/login` with credentials. A successful request will set a cookie `session` with a token.
 Send this token in the Cookie header with all following API requests.
 Some API requests may set a new token.
+
+### Issues
+- Reset password
+- Search expenses
+- Currency
+- Timezones
+- URL for expenses week/id
+- Print
