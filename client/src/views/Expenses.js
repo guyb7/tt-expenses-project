@@ -7,6 +7,7 @@ import API from '../API/API'
 import * as actionCreators from '../store/action-creators'
 
 import ExpensesWeek from '../components/ExpensesWeek'
+import ExpenseDialog from '../components/ExpenseDialog'
 import FloatingActionButton from 'material-ui/FloatingActionButton'
 import ContentAdd from 'material-ui/svg-icons/content/add'
 import ArrowLeft from 'material-ui/svg-icons/navigation/chevron-left'
@@ -64,7 +65,9 @@ class Expenses extends React.Component {
       firstDay: moment().day('monday').hour(0).minute(0).second(0),
       expenses: [],
       firstWeekDay: 'monday',
-      filter: ''
+      filter: '',
+      expenseDialogOpen: false,
+      expenseDialogData: {}
     }
   }
 
@@ -213,6 +216,36 @@ class Expenses extends React.Component {
     })
   }
 
+  openNewExpenseDialog() {
+    this.setState({
+      ...this.state,
+      expenseDialogOpen: true,
+      expenseDialogData: {}
+    })
+  }
+
+  onExpenseUpdate(expense) {
+    const newExpenses = []
+    let foundExistsing = false
+    // Update if expense exists, otherwise push new
+    _.each(this.state.expenses, e => {
+      if (e.id === expense.id) {
+        newExpenses.push(expense)
+        foundExistsing = true
+      } else {
+        newExpenses.push(e)
+      }
+    })
+    if (!foundExistsing) {
+      newExpenses.push(expense)
+    }
+    this.setState({
+      ...this.state,
+      expenseDialogOpen: false,
+      expenses: newExpenses
+    })
+  }
+
   render () {
     return (
       <div style={style.container}>
@@ -254,9 +287,16 @@ class Expenses extends React.Component {
           this.state.is_loading !== true &&
           <ExpensesWeek days={this.calcDays()} />
         }
-        <FloatingActionButton secondary={true} style={style.fab}>
+        <FloatingActionButton
+          onTouchTap={e => this.openNewExpenseDialog()}
+          secondary={true}
+          style={style.fab}>
           <ContentAdd />
         </FloatingActionButton>
+        <ExpenseDialog
+          onSuccess={expense => {this.onExpenseUpdate(expense)}}
+          open={this.state.expenseDialogOpen}
+          expense={this.state.expenseDialogData} />
       </div>
     )
   }

@@ -111,6 +111,26 @@ const mocks = {
           }
         ]
       }
+    },
+    post: params => {
+      if (params.description === 'fail') {
+        return {
+          success: false,
+          error: { id: 'error-creating-expense', text: 'Could not create this expense' }
+        }
+      } else {
+        return {
+          success: true,
+          expenseId: '112bed0f-cdd6-42a2-b15f-6184efde41bd'
+        }
+      }
+    }
+  },
+  '/expenses/112bed0f-cdd6-42a2-b15f-6184efde41bd': {
+    put: params => {
+      return {
+        success: true
+      }
     }
   }
 }
