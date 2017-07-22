@@ -65,9 +65,9 @@ const mocks = {
           success: true,
           user: {
             id: "019eeb5e-7e8a-42ce-b50c-b30e389ec822",
-            username: "user",
-            name: "User1",
-            role: "user"
+            username: "admin",
+            name: "Admin1",
+            role: "admin"
           }
         }
       }
