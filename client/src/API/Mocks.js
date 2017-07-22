@@ -137,6 +137,24 @@ const mocks = {
         success: true
       }
     }
+  },
+  '/admin/users': {
+    get: {
+      success: true,
+      users: [
+        {
+          id: "ffffffff-7172-4f40-b5a6-eb16d44079ff",
+          username: "user",
+          name: "User1",
+          role: "user"
+        }, {
+          id: "55555555-8fd7-47db-8a3a-990115368d3e",
+          username: "admin",
+          name: "Admin1",
+          role: "admin"
+        }
+      ]
+    }
   }
 }
 

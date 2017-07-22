@@ -36,3 +36,8 @@ html, body {
 .hidden {
   display: none;
 }
+
+.tableHiddenCheckboxes tr > th:first-of-type,
+.tableHiddenCheckboxes tr > td:first-of-type {
+  display: none;
+}
