@@ -37,14 +37,9 @@ class SideDrawer extends Component {
       >
         <Menu>
           <MenuItem
-            primaryText="Home"
-            leftIcon={<HomeIcon />}
-            onTouchTap={() => this.changePage('/')} />
-          <MenuItem
             primaryText="Expenses"
             leftIcon={<ExpensesIcon />}
-            onTouchTap={() => this.changePage('/expenses')} />
-
+            onTouchTap={() => this.changePage('/')} />
 
           {
             this.props.user.role !== 'user' &&

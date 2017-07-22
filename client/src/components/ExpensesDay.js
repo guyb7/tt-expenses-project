@@ -12,6 +12,11 @@ const style = {
     borderLeftStyle: 'solid',
     borderLeftColor: teal500
   },
+  emptyCard: {
+    borderLeftWidth: 3,
+    borderLeftStyle: 'solid',
+    borderLeftColor: grey400
+  },
   container: {
     marginTop: 30,
     marginBottom: 30,
@@ -68,7 +73,7 @@ export default class ExpensesDay extends React.Component {
 
   render () {
     return (
-      <Card style={style.card}>
+      <Card style={this.props.day.expenses.length > 0 ? style.card : style.emptyCard}>
         <div style={style.container}>
           <div style={style.date}>
             <div style={style.dateMonthDay}>

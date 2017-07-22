@@ -8,7 +8,6 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 
 import NavBar from './components/NavBar'
 import SideDrawer from './components/SideDrawer'
-import Home from './views/Home'
 import Login from './views/Login'
 import Profile from './views/Profile'
 import Expenses from './views/Expenses'
@@ -33,7 +32,7 @@ class App extends Component {
             <div style={style.screen}>
               <NavBar />
               <SideDrawer />
-              <Route exact path="/" component={Home}/>
+              <Route exact path="/" component={Expenses}/>
               <Route exact path="/login" component={Login}/>
               <Route exact path="/profile" component={Profile}/>
               <Route exact path="/expenses" component={Expenses}/>
