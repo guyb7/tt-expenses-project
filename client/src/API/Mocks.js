@@ -155,6 +155,28 @@ const mocks = {
         }
       ]
     }
+  },
+  '/admin/users/ffffffff-7172-4f40-b5a6-eb16d44079ff': {
+    put: params => {
+      return {
+        success: true
+      }
+    },
+    delete: {
+      success: true
+    }
+  },
+  '/admin/users/55555555-8fd7-47db-8a3a-990115368d3e': {
+    put: params => {
+      return {
+        success: false,
+        error: { id: 'user-not-found', text: 'This user does not exist' }
+      }
+    },
+    delete: {
+      success: false,
+      error: { id: 'user-not-found', text: 'This user does not exist' }
+    }
   }
 }
 
