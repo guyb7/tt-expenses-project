@@ -96,6 +96,9 @@ class AdminUserExpenses extends React.Component {
   }
 
   getExpenses() {
+    if (!this.props.user.logged_in) {
+      return
+    }
     this.setState({
       ...this.state,
       is_loading: true

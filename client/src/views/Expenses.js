@@ -90,11 +90,13 @@ class Expenses extends React.Component {
 
   componentDidMount() {
     this.props.dispatch(actionCreators.setNavTitle('Expenses'))
-    //TODO read url query params
     this.getExpenses()
   }
 
   getExpenses() {
+    if (!this.props.user.logged_in) {
+      return
+    }
     this.setState({
       ...this.state,
       is_loading: true

@@ -13,7 +13,6 @@ import Profile from './views/Profile'
 import Expenses from './views/Expenses'
 import AdminUsers from './views/AdminUsers'
 import AdminUserExpenses from './views/AdminUserExpenses'
-import ComingSoon from './views/ComingSoon'
 
 const baseUrl = process.env.NODE_ENV.toUpperCase() === 'TEST' ? '' : '/app'
 

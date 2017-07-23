@@ -15,6 +15,12 @@ export function setNavTitle(value) {
   }
 }
 
+const delayCallback = (cb) => {
+  setTimeout(() => {
+    cb()
+  }, 20)
+}
+
 export function requestLogin({ username, password, onSuccess, onFail }) {
   return {
     types: ['LOGIN_REQUEST', 'LOGIN_SUCCESS', 'LOGIN_FAILURE'],
@@ -23,13 +29,13 @@ export function requestLogin({ username, password, onSuccess, onFail }) {
         API.post('/login', { username, password })
         .then(res => {
           if (onSuccess) {
-            onSuccess(res)
+            delayCallback(() => onSuccess(res))
           }
           resolve(res)
         })
         .catch(e => {
           if (onFail) {
-            onFail(e)
+            delayCallback(() => onFail(e))
           }
           reject(e)
         })
@@ -64,14 +70,14 @@ export function requestRegister({ username, password, name, onSuccess, onFail })
         API.post('/register', { username, password, name })
         .then(res => {
           if (onSuccess) {
-            onSuccess(res)
+            delayCallback(() => onSuccess(res))
           }
           resolve(res)
           return null
         })
         .catch(e => {
           if (onFail) {
-            onFail(e)
+            delayCallback(() => onFail(e))
           }
           reject(e)
         })
@@ -88,13 +94,13 @@ export function requestProfile({ onSuccess, onFail }) {
         API.get('/profile')
         .then(res => {
           if (onSuccess) {
-            onSuccess(res)
+            delayCallback(() => onSuccess(res))
           }
           resolve(res)
         })
         .catch(e => {
           if (onFail) {
-            onFail(e)
+            delayCallback(() => onFail(e))
           }
           reject(e)
         })
@@ -111,13 +117,13 @@ export function requestUpdateProfile({ name, onSuccess, onFail }) {
         API.put('/profile', { name })
         .then(res => {
           if (onSuccess) {
-            onSuccess({ name })
+            delayCallback(() => onSuccess({ name }))
           }
           resolve({ name })
         })
         .catch(e => {
           if (onFail) {
-            onFail(e)
+            delayCallback(() => onFail(e))
           }
           reject(e)
         })
