@@ -92,19 +92,19 @@ const mocks = {
         "expenses": [
           {
             "id": "cac44371-a922-4906-8563-1ca53e63bbe7",
-            "datetime": "2017-07-01T15:30:00+00:00",
+            "datetime": "2017-07-25T15:30:00+00:00",
             "amount": "3.0",
             "description": "Food",
             "comment": "Burger"
           }, {
             "id": "1fbe2e26-dca3-4846-849a-09e12251db9d",
-            "datetime": "2017-07-01T18:30:00+00:00",
+            "datetime": "2017-07-25T18:30:00+00:00",
             "amount": "10.5",
             "description": "Stuff",
             "comment": "Comment\nNew line!"
           }, {
             "id": "22222222-dca3-4846-849a-09e12251db9d",
-            "datetime": "2017-06-28T10:00:00+00:00",
+            "datetime": "2017-07-27T10:00:00+00:00",
             "amount": "99.99",
             "description": "No comment",
             "comment": ""
@@ -127,6 +127,18 @@ const mocks = {
     }
   },
   '/expenses/112bed0f-cdd6-42a2-b15f-6184efde41bd': {
+    put: params => {
+      return {
+        success: true
+      }
+    },
+    delete: params => {
+      return {
+        success: true
+      }
+    }
+  },
+  '/expenses/1fbe2e26-dca3-4846-849a-09e12251db9d': {
     put: params => {
       return {
         success: true

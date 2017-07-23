@@ -56,8 +56,7 @@ export default class ExpensesDialog extends React.Component {
       error_message: ''
     })
     const expense = {
-      // Automatically adding timeszone offset to store in UTC timezone
-      datetime: this.state.datetime.add(moment().utcOffset(), 'minutes'),
+      datetime: this.state.datetime,
       amount: this.state.amount,
       description: this.state.description,
       comment: this.state.comment
@@ -112,8 +111,9 @@ export default class ExpensesDialog extends React.Component {
   }
 
   dateChange(date) {
-    const prevDate = moment(date).utc()
-    const newDate = moment(this.state.datetime).utc()
+    // Artificially adjusting timeszone offset because MUI time-picker doesn't support specifying timezones
+    const prevDate = moment(date).add(moment().utcOffset(), 'minutes').utc()
+    const newDate = moment(this.state.datetime.utc())
       .year(prevDate.year())
       .month(prevDate.month())
       .date(prevDate.date())
@@ -124,7 +124,8 @@ export default class ExpensesDialog extends React.Component {
   }
 
   timeChange(date) {
-    const prevDate = moment(date).utc()
+    // Artificially adjusting timeszone offset because MUI time-picker doesn't support specifying timezones
+    const prevDate = moment(date).add(moment().utcOffset(), 'minutes').utc()
     const newDate = moment(this.state.datetime).utc()
       .hour(prevDate.hour())
       .minute(prevDate.minute())
@@ -163,6 +164,16 @@ export default class ExpensesDialog extends React.Component {
     })
   }
 
+  dateInUTC(date) {
+    // Artificially adjusting timeszone offset because MUI time-picker doesn't support specifying timezones
+    return moment(date).subtract(moment().utcOffset(), 'minutes').format('YYYY-MM-DD')
+  }
+
+  timeInUTC() {
+    // Artificially adjusting timeszone offset because MUI time-picker doesn't support specifying timezones
+    return moment(this.state.datetime).subtract(moment().utcOffset(), 'minutes').toDate()
+  }
+
   render () {
     const actions = [
       <FlatButton
@@ -197,12 +208,13 @@ export default class ExpensesDialog extends React.Component {
         <DatePicker
           hintText="Date"
           value={this.state.datetime.toDate()}
+          formatDate={this.dateInUTC}
           onChange={(e, date) => this.dateChange(date)}
           disabled={this.state.is_loading}
           />
         <TimePicker
           hintText="Time"
-          value={this.state.datetime.toDate()}
+          value={this.timeInUTC()}
           minutesStep={5}
           onChange={(e, date) => this.timeChange(date)}
           disabled={this.state.is_loading}

@@ -134,3 +134,5 @@ Some API requests may set a new token.
 - Currency
 - Timezones
 - URL for expenses week/id
+- Homepage
+- Mockup data
