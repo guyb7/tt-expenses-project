@@ -92,11 +92,8 @@ GRANT expenses_admin TO postgres WITH ADMIN OPTION;
 /login
 /profile
 /expenses
-/expense/:expenseId
 /admin/users
-/admin/users/:userId
 /admin/users/:userId/expenses
-/admin/expense/:expenseId
 
 ## API
 

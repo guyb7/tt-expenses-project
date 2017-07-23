@@ -45,7 +45,7 @@ class SideDrawer extends Component {
             <MenuItem
               primaryText="Admin"
               leftIcon={<AdminIcon />}
-              onTouchTap={() => this.changePage('/admin')} />
+              onTouchTap={() => this.changePage('/admin/users')} />
           }
           
           <Divider />

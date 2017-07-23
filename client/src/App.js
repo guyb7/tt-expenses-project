@@ -11,7 +11,6 @@ import SideDrawer from './components/SideDrawer'
 import Login from './views/Login'
 import Profile from './views/Profile'
 import Expenses from './views/Expenses'
-import AdminHome from './views/AdminHome'
 import AdminUsers from './views/AdminUsers'
 import AdminUserExpenses from './views/AdminUserExpenses'
 import ComingSoon from './views/ComingSoon'
@@ -38,7 +37,6 @@ class App extends Component {
               <Route exact path="/login" component={Login}/>
               <Route exact path="/profile" component={Profile}/>
               <Route exact path="/expenses" component={Expenses}/>
-              <Route exact path="/admin" component={AdminHome}/>
               <Route exact path="/admin/users" component={AdminUsers}/>
               <Route exact path="/admin/users/:userId/expenses" component={AdminUserExpenses}/>
             </div>
