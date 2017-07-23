@@ -154,6 +154,19 @@ const mocks = {
           role: "admin"
         }
       ]
+    },
+    post: params => {
+      if (params.name === 'fail') {
+        return {
+          success: false,
+          error: { id: 'error-creating-user', text: 'This username already exists' }
+        }
+      } else {
+        return {
+            success: true,
+            userId: "48b2857b-9720-4f27-8056-66484e4edcb3"
+        }
+      }
     }
   },
   '/admin/users/ffffffff-7172-4f40-b5a6-eb16d44079ff': {

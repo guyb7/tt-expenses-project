@@ -21,10 +21,15 @@ import CancelIcon from 'material-ui/svg-icons/navigation/close'
 import DeleteIcon from 'material-ui/svg-icons/action/delete'
 import { orange100 } from 'material-ui/styles/colors'
 import Snackbar from 'material-ui/Snackbar'
+import ContentAdd from 'material-ui/svg-icons/content/add'
+import FloatingActionButton from 'material-ui/FloatingActionButton'
 
 const style = {
   input: {
     width: '100%'
+  },
+  inputHalf: {
+    width: '50%'
   },
   selectInput: {
     width: '100%',
@@ -38,6 +43,11 @@ const style = {
   row: {},
   changedRow: {
     backgroundColor: orange100
+  },
+  fab: {
+    position: 'fixed',
+    bottom: 15,
+    right: 15
   }
 }
 
@@ -47,17 +57,34 @@ class UserRow extends React.Component {
     this.state = {
       ...props,
       is_loading: false,
-      has_changes: false,
+      has_changes: props.id === false,
+      password: '',
       originalProps: props,
       is_deleted: false,
       error_message: false
     }
   }
 
+  onUsernameChange(val) {
+    this.setState({
+      ...this.state,
+      username: val,
+      has_changes: true
+    })
+  }
+
   onNameChange(val) {
     this.setState({
       ...this.state,
       name: val,
+      has_changes: true
+    })
+  }
+
+  onPasswordChange(val) {
+    this.setState({
+      ...this.state,
+      password: val,
       has_changes: true
     })
   }
@@ -71,29 +98,60 @@ class UserRow extends React.Component {
   }
 
   onRowSave() {
-    this.setState({
-      ...this.state,
-      is_loading: true
-    })
-    API.put('/admin/users/' + this.state.id, {
-      name: this.state.name,
-      role: this.state.role
-    })
-    .then(res => {
+    if (this.state.id === false) {
       this.setState({
         ...this.state,
-        has_changes: false
+        is_loading: true
       })
-    })
-    .catch(e => {
-      console.log('e', e)
-    })
-    .finally(() => {
+      API.post('/admin/users', {
+        username: this.state.username,
+        password: this.state.password,
+        name: this.state.name,
+        role: this.state.role
+      })
+      .then(res => {
+        this.setState({
+          ...this.state,
+          id: res.data.userId,
+          has_changes: false
+        })
+      })
+      .catch(e => {
+        console.log('e', e)
+        this.showErrorMessage(e.message)
+      })
+      .finally(() => {
+        this.setState({
+          ...this.state,
+          is_loading: false
+        })
+      })
+    } else {
       this.setState({
         ...this.state,
-        is_loading: false
+        is_loading: true
       })
-    })
+      API.put('/admin/users/' + this.state.id, {
+        name: this.state.name,
+        role: this.state.role
+      })
+      .then(res => {
+        this.setState({
+          ...this.state,
+          has_changes: false
+        })
+      })
+      .catch(e => {
+        console.log('e', e)
+        this.showErrorMessage(e.message)
+      })
+      .finally(() => {
+        this.setState({
+          ...this.state,
+          is_loading: false
+        })
+      })
+    }
   }
 
   onRowDelete() {
@@ -121,10 +179,17 @@ class UserRow extends React.Component {
   }
 
   onRowReset() {
-    this.setState({
-      ...this.state.originalProps,
-      has_changes: false
-    })
+    if (this.state.id === false) {
+      this.setState({
+        ...this.state,
+        is_deleted: true
+      })
+    } else {
+      this.setState({
+        ...this.state.originalProps,
+        has_changes: false
+      })
+    }
   }
 
   showErrorMessage(message) {
@@ -149,14 +214,29 @@ class UserRow extends React.Component {
       <TableRow style={this.state.has_changes ? style.changedRow : style.row}>
         <TableRowColumn>
           <TextField
+            hintText="Login"
             id={"username-field-" + this.state.id}
             value={this.state.username}
-            style={style.input}
-            disabled={true}
+            style={this.state.id === false ? style.inputHalf : style.input}
+            onChange={(e, val) => this.onUsernameChange(val)}
+            disabled={this.state.is_loading || this.state.id !== false}
           />
+          {
+            this.state.id === false &&
+            <TextField
+              hintText="Password"
+              id={"password-field-" + this.state.id}
+              value={this.state.password}
+              type="password"
+              style={style.inputHalf}
+              onChange={(e, val) => this.onPasswordChange(val)}
+              disabled={this.state.is_loading}
+            />
+          }
         </TableRowColumn>
         <TableRowColumn>
           <TextField
+            hintText="Name"
             id={"name-field-" + this.state.id}
             value={this.state.name}
             style={style.input}
@@ -200,7 +280,7 @@ class UserRow extends React.Component {
             />
           }
           {
-            !this.state.has_changes &&
+            !this.state.has_changes && this.state.id &&
             <FlatButton
               icon={<DeleteIcon />}
               style={style.actionButton}
@@ -257,6 +337,13 @@ class AdminUsers extends React.Component {
     return this.props.user.role === 'admin'
   }
 
+  openNewUserModal() {
+    this.setState({
+      ...this.state,
+      users: [...this.state.users, { id: false, username: '', name: 'New User', role: 'user'}]
+    })
+  }
+
   render () {
     return (
       <div style={style.container}>
@@ -287,6 +374,12 @@ class AdminUsers extends React.Component {
             }
           </TableBody>
         </Table>
+        <FloatingActionButton
+          onTouchTap={e => this.openNewUserModal()}
+          secondary={true}
+          style={style.fab}>
+          <ContentAdd />
+        </FloatingActionButton>
       </div>
     )
   }
