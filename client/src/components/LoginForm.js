@@ -69,6 +69,13 @@ class LoginForm extends React.Component {
     })
   }
 
+  nameChange(e) {
+    this.setState({
+      ...this.state,
+      name: e.target.value
+    })
+  }
+
   login() {
     this.clearErrors()
     if (this.validateFields()) {
@@ -235,6 +242,9 @@ class LoginForm extends React.Component {
                   ></TextField>
                 <TextField
                   floatingLabelText="Name"
+                  value={this.state.name}
+                  onChange={e => this.nameChange(e)}
+                  disabled={this.state.is_loading}
                   ></TextField>
                 <RaisedButton
                   label="Register"

@@ -136,3 +136,6 @@ Some API requests may set a new token.
 - URL for expenses week/id
 - Homepage
 - Mockup data
+- Activity logs
+- Redirect to login on session-expired
+- Expense dialog cancel - update parent state
