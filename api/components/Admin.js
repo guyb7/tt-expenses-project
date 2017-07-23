@@ -43,7 +43,11 @@ const updateUser = (req, res) => {
   Users.findUser({ unknown: req.params.userId })
   .then(({ user }) => ensurePermission({ user: req.user, resource: { role: user.role }, payload: user }))
   .then((user) => {
-    Users.updateUser(user.id, { name: req.body.name })
+    const params = { name: req.body.name }
+    if (req.body.role && req.user.role === 'admin') {
+      params.role = req.body.role
+    }
+    Users.updateUser(user.id, params)
     .then(() => {
       res.json({
         success: true

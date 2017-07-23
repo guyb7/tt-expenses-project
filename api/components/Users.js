@@ -130,13 +130,21 @@ const update = (req, res) => {
   })
 }
 
-const updateUser = (id, { name }) => {
+const updateUser = (id, { name, role }) => {
   return new Promise((resolve, reject) => {
-    Db.query('UPDATE users SET name=$2 WHERE id=$1 AND is_deleted=false', [id, name])
-    .then(result => {
-      resolve()
-    })
-    .catch(reject)
+    if (role) {
+      Db.query('UPDATE users SET name=$2, role=$3 WHERE id=$1 AND is_deleted=false', [id, name, role])
+      .then(result => {
+        resolve()
+      })
+      .catch(reject)
+    } else {
+      Db.query('UPDATE users SET name=$2 WHERE id=$1 AND is_deleted=false', [id, name])
+      .then(result => {
+        resolve()
+      })
+      .catch(reject)
+    }
   })
 }
 
