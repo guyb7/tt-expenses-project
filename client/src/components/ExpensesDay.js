@@ -71,11 +71,15 @@ export default class ExpensesDay extends React.Component {
     return moment(date).format('ddd')
   }
 
+  isEmpty() {
+    return this.props.day.expenses.length === 0
+  }
+
   render () {
     return (
-      <Card style={this.props.day.expenses.length > 0 ? style.card : style.emptyCard}>
+      <Card style={this.isEmpty() ? style.emptyCard : style.card} className={this.isEmpty() ? 'expenseDayEmpty' : 'expenseDay'}>
         <div style={style.container}>
-          <div style={style.date}>
+          <div style={style.date} className="expenseDayDate">
             <div style={style.dateMonthDay}>
               {this.monthDay(this.props.day.date)}
             </div>
@@ -92,7 +96,7 @@ export default class ExpensesDay extends React.Component {
               })
             }
             {
-              this.props.day.expenses.length === 0 &&
+              this.isEmpty() &&
               <div style={style.noExpensesMsg}>
                 No expenses on this day
               </div>

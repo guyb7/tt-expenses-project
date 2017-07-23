@@ -258,10 +258,14 @@ class AdminUserExpenses extends React.Component {
     })
   }
 
+  printPage() {
+    window.print()
+  }
+
   render () {
     return (
       <div style={style.container}>
-        <Toolbar>
+        <Toolbar className="printHide">
           <ToolbarGroup firstChild={true}>
             <FlatButton
               style={style.datePrevBtn}
@@ -277,7 +281,7 @@ class AdminUserExpenses extends React.Component {
               onTouchTap={e => this.setDateNextWeek()} />
           </ToolbarGroup>
           <ToolbarGroup>
-            <FlatButton icon={<PrintIcon/>} />
+            <FlatButton icon={<PrintIcon/>} onTouchTap={e => this.printPage()} />
             <FlatButton label="Today" onTouchTap={e => this.setDateToday()} />
           </ToolbarGroup>
         </Toolbar>
@@ -287,7 +291,7 @@ class AdminUserExpenses extends React.Component {
           ref={(input) => { this.dateInput = input }}
           onChange={(e, date) => this.onDatepickerUpdate(date)}
           value={this.state.firstDay.toDate()} />
-        <div style={style.searchContainer}>
+        <div style={style.searchContainer} className="printHide">
           <TextField
             hintText="Filter"
             value={this.state.filter}
@@ -295,6 +299,7 @@ class AdminUserExpenses extends React.Component {
           />
           <SearchIcon style={style.searchIcon} />
         </div>
+        <h2 className="printOnly">{this.state.username} Expenses - {this.weekRangeText()} {this.year()}</h2>
         {
           this.state.is_loading !== true &&
           <ExpensesWeek days={this.calcDays()} onExpenseOpen={e => this.openNewExpenseDialog(e)} />
@@ -302,7 +307,8 @@ class AdminUserExpenses extends React.Component {
         <FloatingActionButton
           onTouchTap={e => this.openNewExpenseDialog()}
           secondary={true}
-          style={style.fab}>
+          style={style.fab}
+          className="printHide">
           <ContentAdd />
         </FloatingActionButton>
         <ExpenseDialog

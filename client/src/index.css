@@ -45,3 +45,24 @@ html, body {
 .tableHiddenCheckboxes hr {
   display: none;
 }
+
+.printOnly {
+  display: none;
+}
+@media print {
+  .printHide {
+    display: none !important;
+  }
+  .printOnly {
+    display: block;
+  }
+  .expenseDay {
+    border-left: 0 solid transparent !important;
+  }
+  .expenseDayEmpty {
+    display: none !important;
+  }
+  .expenseDayDate {
+    border-right: 0 solid transparent !important;
+  }
+}

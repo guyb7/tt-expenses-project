@@ -42,6 +42,7 @@ class NavBar extends Component {
         title={this.props.title}
         onLeftIconButtonTouchTap={() => this.openDrawer()}
         iconElementRight={this.props.user.logged_in ? <ProfileMenu></ProfileMenu> : null}
+        className="printHide"
       />
     )
   }
