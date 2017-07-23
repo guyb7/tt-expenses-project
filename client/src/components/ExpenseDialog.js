@@ -26,7 +26,9 @@ export default class ExpensesDialog extends React.Component {
       open: this.props.open,
       error_message: '',
       ...emptyExpense,
-      ...this.props.expense
+      ...this.props.expense,
+      expensesBaseUrl: props.username ? '/admin/expenses' : '/expenses',
+      userExpensesBaseUrl: props.username ? '/admin/users/' + props.username + '/expenses' : '/expenses',
     }
   }
 
@@ -62,7 +64,7 @@ export default class ExpensesDialog extends React.Component {
     }
     if (this.state.id) {
       // Update
-      API.put('/expenses/' + this.state.id, expense)
+      API.put(this.state.expensesBaseUrl + '/' + this.state.id, expense)
       .then(res => {
         if (this.props.onSuccess) {
           this.props.onSuccess({
@@ -77,7 +79,7 @@ export default class ExpensesDialog extends React.Component {
       })
     } else {
       // Create
-      API.post('/expenses', expense)
+      API.post(this.state.userExpensesBaseUrl, expense)
       .then(res => {
         if (this.props.onSuccess) {
           this.props.onSuccess({
@@ -94,7 +96,7 @@ export default class ExpensesDialog extends React.Component {
   }
 
   deleteExpense() {
-    API.delete('/expenses/' + this.state.id)
+    API.delete(this.state.expensesBaseUrl + '/' + this.state.id)
     .then(res => {
       if (this.props.onSuccess) {
         this.props.onSuccess({

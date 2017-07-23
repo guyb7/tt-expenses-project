@@ -4,6 +4,7 @@ import { withRouter } from 'react-router-dom'
 
 import * as actionCreators from '../store/action-creators'
 
+import { getParams } from '../components/Utils'
 import LoginForm from '../components/LoginForm'
 import CircularProgress from 'material-ui/CircularProgress'
 
@@ -29,25 +30,12 @@ class Login extends React.Component {
   }
 
   returnToURL() {
-    const queryParams = this.getParams(this.props.history.location.search)
+    const queryParams = getParams(this.props.history.location.search)
     if (queryParams.returnUrl) {
       this.props.history.push(queryParams.returnUrl)
     } else {
       this.props.history.push('/')
     }
-  }
-
-  getParams(query) {
-    if (!query) {
-      return {}
-    }
-    return (/^[?#]/.test(query) ? query.slice(1) : query)
-    .split('&')
-    .reduce((params, param) => {
-      let [key, value] = param.split('=')
-      params[key] = value ? decodeURIComponent(value.replace(/\+/g, ' ')) : ''
-      return params;
-    }, {})
   }
 
   showForm() {

@@ -19,6 +19,7 @@ import MenuItem from 'material-ui/MenuItem'
 import CheckIcon from 'material-ui/svg-icons/navigation/check'
 import CancelIcon from 'material-ui/svg-icons/navigation/close'
 import DeleteIcon from 'material-ui/svg-icons/action/delete'
+import ArrowRightIcon from 'material-ui/svg-icons/navigation/chevron-right'
 import { orange100 } from 'material-ui/styles/colors'
 import Snackbar from 'material-ui/Snackbar'
 import ContentAdd from 'material-ui/svg-icons/content/add'
@@ -206,6 +207,10 @@ class UserRow extends React.Component {
     })
   }
 
+  navigateToExpenses() {
+    this.props.history.push('/admin/users/' + this.state.username + '/expenses')
+  }
+
   render() {
     if (this.state.is_deleted === true) {
       return null
@@ -285,6 +290,15 @@ class UserRow extends React.Component {
               icon={<DeleteIcon />}
               style={style.actionButton}
               onTouchTap={e => this.onRowDelete()}
+              disabled={this.state.is_loading}
+            />
+          }
+          {
+            !this.state.has_changes && this.state.id &&
+            <FlatButton
+              icon={<ArrowRightIcon />}
+              style={style.actionButton}
+              onTouchTap={e => this.navigateToExpenses()}
               disabled={this.state.is_loading}
             />
           }
@@ -369,6 +383,7 @@ class AdminUsers extends React.Component {
                   name={u.name}
                   role={u.role}
                   is_admin={this.isAdmin()}
+                  history={this.props.history}
                 />)
               })
             }

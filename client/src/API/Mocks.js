@@ -190,13 +190,70 @@ const mocks = {
       success: false,
       error: { id: 'user-not-found', text: 'This user does not exist' }
     }
+  },
+  '/admin/users/user/expenses': {
+    get: {
+      success: true,
+      "expenses": [
+        {
+          id: "3ee26fc8-37ac-4550-9715-64e7a7392a13",
+          datetime: "2017-07-24T18:30:00+00:00",
+          amount: "10.5",
+          description: "User expense - Office supplies",
+          comment: "Paper clips"
+        }, {
+          id: "02128ffa-40ae-4c40-98d8-e100e708fe8c",
+          datetime: "2017-07-25T18:30:00+00:00",
+          amount: "10.5",
+          description: "User expense - Expense from admin",
+          comment: "Adminn"
+        }, {
+          id: "cb8a0f76-1b20-40c9-b3dd-46f8b8e03e81",
+          datetime: "2017-07-25T18:30:00+00:00",
+          amount: "10.5",
+          description: "User expense - Expense from admin",
+          comment: "Adminn"
+        }
+      ]
+    },
+    post: params => {
+      if (params.description === 'fail') {
+        return {
+          success: false,
+          error: { id: 'error-creating-expense', text: 'Could not create this expense' }
+        }
+      } else {
+        return {
+          success: true,
+          expenseId: '112bed0f-cdd6-42a2-b15f-6184efde41bd'
+        }
+      }
+    }
+  },
+  '/admin/users/user/expenses/3ee26fc8-37ac-4550-9715-64e7a7392a13': {
+    put: params => {
+      return {
+        success: true
+      }
+    },
+    delete: params => {
+      return {
+        success: true
+      }
+    }
   }
 }
 
 export default (method, route, params) => {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      const response = mocks[route][method]
+      let response
+      try {
+        response = mocks[route][method]
+      } catch (e) {
+        console.log('mock-not-found', route, params)
+        return reject(new APIError({ success: false, error: { text: 'Mock not found'}}))
+      }
       if (_.isFunction(response)) {
         const res = response(params)
         console.log('MOCK API RESPONSE', method, route, res)
