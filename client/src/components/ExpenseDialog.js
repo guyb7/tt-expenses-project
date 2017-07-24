@@ -9,6 +9,34 @@ import FlatButton from 'material-ui/FlatButton'
 import TextField from 'material-ui/TextField'
 import DatePicker from 'material-ui/DatePicker'
 import TimePicker from 'material-ui/TimePicker'
+import { blue500 } from 'material-ui/styles/colors'
+
+const style = {
+  content: {
+    maxWidth: 450
+  },
+  title: {
+    color: blue500
+  },
+  body: {
+    width: '100%'
+  },
+  datetime: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  },
+  amount: {
+    maxWidth: 100
+  },
+  description: {
+    width: '100%'
+  },
+  comment: {
+    width: '100%'
+  }
+}
 
 const emptyExpense = {
   id: false,
@@ -208,34 +236,44 @@ export default class ExpensesDialog extends React.Component {
         actions={actions}
         modal={false}
         open={this.state.open}
+        titleStyle={style.title}
+        contentStyle={style.content}
+        bodyStyle={style.body}
         onRequestClose={() => this.handleClose()}
       >
-        <DatePicker
-          hintText="Date"
-          value={this.state.datetime.toDate()}
-          formatDate={this.dateInUTC}
-          onChange={(e, date) => this.dateChange(date)}
-          disabled={this.state.is_loading}
-          />
-        <TimePicker
-          hintText="Time"
-          value={this.timeInUTC()}
-          minutesStep={5}
-          onChange={(e, date) => this.timeChange(date)}
-          disabled={this.state.is_loading}
-          />
-        <TextField
-          floatingLabelText="Amount"
-          type="number"
-          value={this.state.amount}
-          onChange={e => this.amountChange(e)}
-          disabled={this.state.is_loading}
-          />
+        <div style={style.datetime}>
+          <DatePicker
+            floatingLabelText="Date"
+            value={this.state.datetime.toDate()}
+            formatDate={this.dateInUTC}
+            onChange={(e, date) => this.dateChange(date)}
+            disabled={this.state.is_loading}
+            />
+          <TimePicker
+            floatingLabelText="Time"
+            value={this.timeInUTC()}
+            minutesStep={5}
+            onChange={(e, date) => this.timeChange(date)}
+            disabled={this.state.is_loading}
+            />
+        </div>
+        <div>
+          $&nbsp;
+          <TextField
+            floatingLabelText="Amount"
+            type="number"
+            value={this.state.amount}
+            onChange={e => this.amountChange(e)}
+            disabled={this.state.is_loading}
+            style={style.amount}
+            />
+        </div>
         <TextField
           floatingLabelText="Description"
           value={this.state.description}
           onChange={e => this.descriptionChange(e)}
           disabled={this.state.is_loading}
+          style={style.description}
           />
         <TextField
           floatingLabelText="Comment"
@@ -243,6 +281,7 @@ export default class ExpensesDialog extends React.Component {
           value={this.state.comment}
           onChange={e => this.commentChange(e)}
           disabled={this.state.is_loading}
+          style={style.comment}
           />
         <ErrorMessage text={this.state.error_message}></ErrorMessage>
       </Dialog>

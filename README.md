@@ -133,9 +133,11 @@ Some API requests may set a new token.
 - Search expenses
 - Currency
 - Timezones
+- Localized date/time formats
 - URL for expenses week/id
 - Homepage
 - Mockup data
 - Activity logs
 - Redirect to login on session-expired
-- Expense dialog cancel - update parent state
+- Expenses - order by time
+- Admin fix change user role
