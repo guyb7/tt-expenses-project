@@ -7,9 +7,55 @@
     <link rel="manifest" href="/app/manifest.json">
     <link rel="shortcut icon" href="/public/favicon.ico">
     <title>Expenses Tracking App</title>
+    <style>
+      @font-face{font-family:Roboto;font-style:normal;font-weight:300;src:local("Roboto Light"),local("Roboto-Light"),url(/app/static/media/Hgo13k-tfSpn0qi1SFdUfZBw1xU1rKptJj_0jans920.502c0706.woff2) format("woff2")}
+      html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+      }
+      body {
+        font-family: Roboto, sans-serif;
+        background-color: #607D8B;
+        color: #FFF;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        align-items: center;
+        text-align: center;
+      }
+      h1 {
+        font-size: 42px;
+        letter-spacing: 2px;
+        font-weight: 300;
+      }
+      h2 {
+        font-size: 20px;
+        letter-spacing: 1px;
+        color: #CFD8DC;
+      }
+      a {
+        background-color: #00BCD4;
+        padding: 16px 32px;
+        text-decoration: none;
+        color: #E0F7FA;
+        border-radius: 4px;
+        margin: 64px;
+        display: block;
+      }
+      a:hover {
+        color: #fff;
+        background-color: #26C6DA;
+        text-decoration: none;
+      }
+    </style>
   </head>
   <body>
-    <h1>Hello</h1>
-    <a href="/app">Launch App</a>
+    <div>
+      <h1>Expenses</h1>
+      <h2>Track expenses in your company</h2>
+      <a href="/app">Launch App</a>
+    </div>
   </body>
 </html>
