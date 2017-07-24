@@ -1,4 +1,5 @@
 import Db from '../Database'
+import Authentication from '../Authentication'
 import Errors from '../Errors'
 import bcrypt from 'bcrypt'
 import Promise from 'bluebird'
@@ -35,14 +36,13 @@ const getHash = ({ req }) => {
 }
 
 const createNewUser = ({ req, hash }) => {
-  // { username, password_hash, name, role }
   return new Promise((resolve, reject) => {
     const userId = uuid()
     const params = [
       userId,
       req.body.username,
       hash,
-      req.body.name || 'User',
+      req.body.name || 'New User',
       req.body.role || 'user'
     ]
     Db.query('INSERT INTO users (id, username, password, name, role) VALUES ($1, $2, $3, $4, $5);', params)
@@ -119,23 +119,60 @@ const getCurrent = (req, res) => {
 }
 
 const update = (req, res) => {
-  updateUser(req.user.id, { name: req.body.name })
-  .then(result => {
-    res.json({
-      success: true
+  const params = { name: req.body.name }
+  if (req.body.password && req.body.password.length > 0 && req.body.old_password) {
+    Authentication.findUser(req.user.username, req.body.old_password)
+    .then(Authentication.validatePassword)
+    .then(({ user }) => {
+      getHash({ req })
+      .then(({ req, hash }) => {
+        params.password = hash
+        updateUser(req.user.id, params, req)
+        .then(result => {
+          res.json({
+            success: true
+          })
+        })
+        .catch(e => {
+          Errors.handleError(req, res, e, 'error-updating-user')
+        })
+      })
     })
-  })
-  .catch(e => {
-    Errors.handleError(req, res, e, 'error-updating-user')
-  })
+    .catch(e => {
+      Errors.handleError(req, res, e, 'invalid-credentials')
+    })
+  } else {
+    updateUser(req.user.id, params)
+    .then(result => {
+      res.json({
+        success: true
+      })
+    })
+    .catch(e => {
+      Errors.handleError(req, res, e, 'error-updating-user')
+    })
+  }
 }
 
-const updateUser = (id, { name, role }) => {
+const updateUser = (id, { name, role, password }, req) => {
   return new Promise((resolve, reject) => {
     if (role) {
       Db.query('UPDATE users SET name=$2, role=$3 WHERE id=$1 AND is_deleted=false', [id, name, role])
       .then(result => {
         resolve()
+      })
+      .catch(reject)
+    } else if (password) {
+      Db.query('UPDATE users SET name=$2, password=$3 WHERE id=$1 AND is_deleted=false', [id, name, password])
+      .then(result => {
+        if (req) {
+          req.session.regenerate(err => {
+            resolve()
+          })
+        } else {
+          console.error('Could not regenerate session')
+          resolve()
+        }
       })
       .catch(reject)
     } else {

@@ -44,7 +44,7 @@ const updateUser = (req, res) => {
   .then(({ user }) => ensurePermission({ user: req.user, resource: { role: user.role }, payload: user }))
   .then((user) => {
     const params = { name: req.body.name }
-    if (req.body.role && req.user.role === 'admin') {
+    if (req.body.role && req.user.role === 'admin' && _.indexOf(['user', 'manager', 'admin'], req.body.role) > -1) {
       params.role = req.body.role
     }
     Users.updateUser(user.id, params)

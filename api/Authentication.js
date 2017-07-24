@@ -47,14 +47,8 @@ const SetupPassport = (app) => {
   })
 
   passport.deserializeUser((id, done) => {
-    console.log('deserializeUser', 'id?', id)
-    const users = {
-      123: {
-        id: 123,
-        name: 'Guy'
-      }
-    }
-    done(null, users[123])
+    console.error('deserializeUser', id)
+    done(null, null)
   })
 
   app.use(passport.initialize())
@@ -112,5 +106,9 @@ export default {
   
   ensureAdmin,
 
-  destroyUserSession
+  destroyUserSession,
+
+  findUser,
+
+  validatePassword
 }
