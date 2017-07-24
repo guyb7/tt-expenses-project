@@ -42,6 +42,8 @@ class Profile extends React.Component {
     this.state = {
       is_loading: false,
       name: this.props.user.name || '',
+      old_password: '',
+      password: '',
       error_message: ''
     }
   }
@@ -57,17 +59,42 @@ class Profile extends React.Component {
     })
   }
 
+  oldPasswordChange(e) {
+    this.setState({
+      ...this.state,
+      old_password: e.target.value
+    })
+  }
+
+  passwordChange(e) {
+    this.setState({
+      ...this.state,
+      password: e.target.value
+    })
+  }
+
   saveProfile() {
     this.setState({
       ...this.state,
       is_loading: true
     })
+    const params = {
+      name: this.state.name
+    }
+    if (this.state.old_password.length > 0) {
+      params.old_password = this.state.old_password
+    }
+    if (this.state.password.length > 0) {
+      params.password = this.state.password
+    }
     this.props.dispatch(actionCreators.requestUpdateProfile({
-      name: this.state.name,
+      profile: params,
       onSuccess: () => {
         this.setState({
           ...this.state,
-          is_loading: false
+          is_loading: false,
+          old_password: '',
+          password: ''
         })
       },
       onFail: e => {
@@ -94,6 +121,21 @@ class Profile extends React.Component {
                 floatingLabelText="Name"
                 value={this.state.name}
                 onChange={e => this.nameChange(e)}
+                disabled={this.state.is_loading}
+                ></TextField>
+              <hr/>
+              <TextField
+                floatingLabelText="Current Password"
+                value={this.state.old_password}
+                onChange={e => this.oldPasswordChange(e)}
+                type="password"
+                disabled={this.state.is_loading}
+                ></TextField>
+              <TextField
+                floatingLabelText="New Password"
+                value={this.state.password}
+                onChange={e => this.passwordChange(e)}
+                type="password"
                 disabled={this.state.is_loading}
                 ></TextField>
               <RaisedButton

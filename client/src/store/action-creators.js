@@ -109,17 +109,17 @@ export function requestProfile({ onSuccess, onFail }) {
   }
 }
 
-export function requestUpdateProfile({ name, onSuccess, onFail }) {
+export function requestUpdateProfile({ profile, onSuccess, onFail }) {
   return {
     types: ['PROFILE_UPDATE_REQUEST', 'PROFILE_UPDATE_SUCCESS', 'PROFILE_UPDATE_FAILURE'],
     promise: () => {
       return new Promise((resolve, reject) => {
-        API.put('/profile', { name })
+        API.put('/profile', profile)
         .then(res => {
           if (onSuccess) {
-            delayCallback(() => onSuccess({ name }))
+            delayCallback(() => onSuccess({ name: profile.name }))
           }
-          resolve({ name })
+          resolve({ name: profile.name })
         })
         .catch(e => {
           if (onFail) {

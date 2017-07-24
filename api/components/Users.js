@@ -166,8 +166,13 @@ const updateUser = (id, { name, role, password }, req) => {
       Db.query('UPDATE users SET name=$2, password=$3 WHERE id=$1 AND is_deleted=false', [id, name, password])
       .then(result => {
         if (req) {
+          // Generate a new SessionID, copy the existing session data to the new one
+          const oldSession = _.clone(req.session)
           req.session.regenerate(err => {
-            resolve()
+            req.session = Object.assign(req.session, oldSession)
+            req.session.save(err => {
+              resolve()
+            })
           })
         } else {
           console.error('Could not regenerate session')
