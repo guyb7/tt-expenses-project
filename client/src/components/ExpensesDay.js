@@ -1,5 +1,6 @@
 import React from 'react'
 import moment from 'moment'
+import _ from 'lodash'
 
 import ExpensesItem from './ExpensesItem'
 import FlatButton from 'material-ui/FlatButton'
@@ -75,6 +76,10 @@ export default class ExpensesDay extends React.Component {
     return this.props.day.expenses.length === 0
   }
 
+  orderedExpenses() {
+    return _.sortBy(this.props.day.expenses, e => e.datetime)
+  }
+
   render () {
     return (
       <Card style={this.isEmpty() ? style.emptyCard : style.card} className={this.isEmpty() ? 'expenseDayEmpty' : 'expenseDay'}>
@@ -89,7 +94,7 @@ export default class ExpensesDay extends React.Component {
           </div>
           <div style={style.expenses}>
             {
-              this.props.day.expenses.map(e => {
+              this.orderedExpenses().map(e => {
                 return (
                   <ExpensesItem expense={e} key={e.id} onExpenseOpen={this.props.onExpenseOpen} />
                 )

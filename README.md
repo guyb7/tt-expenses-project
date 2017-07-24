@@ -129,15 +129,12 @@ Send this token in the Cookie header with all following API requests.
 Some API requests may set a new token.
 
 ### Issues
-- Reset password
 - Search expenses
 - Currency
 - Timezones
 - Localized date/time formats
-- URL for expenses week/id
-- Homepage
-- Mockup data
+- Reset password
 - Activity logs
 - Redirect to login on session-expired
-- Expenses - order by time
-- Admin fix change user role
+- URL for expenses week/id
+- Mockup data
