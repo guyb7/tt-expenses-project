@@ -45,7 +45,12 @@ export default class ExpensesDialog extends React.Component {
     this.setState({
       ...this.state,
       is_loading: false,
+      error_message: '',
       open: false
+    }, () => {
+      if (this.props.onClear) {
+        this.props.onClear()
+      }
     })
   }
 

@@ -259,6 +259,14 @@ class Expenses extends React.Component {
     })
   }
 
+  clearExpenseDialog(expenseId) {
+    this.setState({
+      ...this.state,
+      expenseDialogOpen: false,
+      expenseDialogData: {}
+    })
+  }
+
   printPage() {
     window.print()
   }
@@ -314,6 +322,7 @@ class Expenses extends React.Component {
         </FloatingActionButton>
         <ExpenseDialog
           onSuccess={expense => {this.onExpenseUpdate(expense)}}
+          onClear={() => {this.clearExpenseDialog()}}
           open={this.state.expenseDialogOpen}
           expense={this.state.expenseDialogData} />
       </div>

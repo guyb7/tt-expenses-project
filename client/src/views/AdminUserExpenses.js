@@ -261,6 +261,14 @@ class AdminUserExpenses extends React.Component {
     })
   }
 
+  clearExpenseDialog(expenseId) {
+    this.setState({
+      ...this.state,
+      expenseDialogOpen: false,
+      expenseDialogData: {}
+    })
+  }
+
   printPage() {
     window.print()
   }
@@ -317,6 +325,7 @@ class AdminUserExpenses extends React.Component {
         <ExpenseDialog
           username={this.state.username}
           onSuccess={expense => {this.onExpenseUpdate(expense)}}
+          onClear={() => {this.clearExpenseDialog()}}
           open={this.state.expenseDialogOpen}
           expense={this.state.expenseDialogData} />
       </div>
