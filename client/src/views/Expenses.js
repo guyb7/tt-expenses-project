@@ -19,6 +19,7 @@ import DatePicker from 'material-ui/DatePicker'
 import SearchIcon from 'material-ui/svg-icons/action/search'
 import TextField from 'material-ui/TextField'
 import { grey400 } from 'material-ui/styles/colors'
+import { log } from '../components/Utils'
 
 const style = {
   container: {
@@ -125,7 +126,7 @@ class Expenses extends React.Component {
   }
 
   calcDays() {
-    console.log('Recalculating')
+    log('Recalculating')
     const daysMap = {}
     const firstDay = moment(this.state.firstDay)
     _.times(7, n => {
@@ -147,7 +148,7 @@ class Expenses extends React.Component {
           })
         }
       } else {
-        console.log('Day out of range', day, e)
+        log('Day out of range', day, e)
       }
     })
     const days = []

@@ -10,3 +10,13 @@ export function getParams(query) {
     return params;
   }, {})
 }
+
+export function log(message, obj) {
+  if (process.env.NODE_ENV.toUpperCase() === 'DEVELOPMENT') {
+    if (obj) {
+      console.log(message, obj)
+    } else {
+      console.log(message)
+    }
+  }
+}
