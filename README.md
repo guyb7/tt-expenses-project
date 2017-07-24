@@ -130,11 +130,12 @@ Some API requests may set a new token.
 
 ### Issues
 - Search expenses
+- Forgot password
+- Client tests
+- Activity logs
+- Redirect to login on session-expired
 - Currency
 - Timezones
 - Localized date/time formats
-- Reset password
-- Activity logs
-- Redirect to login on session-expired
 - URL for expenses week/id
-- Mockup data
+- API versioning
